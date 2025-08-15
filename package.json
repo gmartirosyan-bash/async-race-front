@@ -1,8 +1,20 @@
 {
   "name": "async-race-front",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
+  "description": "",
+  "homepage": "https://github.com/gmartirosyan-bash/async-race-front#readme",
+  "bugs": {
+    "url": "https://github.com/gmartirosyan-bash/async-race-front/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gmartirosyan-bash/async-race-front.git"
+  },
+  "license": "ISC",
+  "author": "Gagik",
   "type": "module",
+  "main": "eslint.config.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -10,8 +22,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
+    "@tailwindcss/vite": "^4.1.12",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.8.0",
+    "tailwindcss": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
