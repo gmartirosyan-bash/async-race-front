@@ -26,3 +26,8 @@ button {
 button:hover {
   background-color: rgb(0, 183, 0);
 }
+
+input {
+  background-color: white;
+  color: black;
+}
