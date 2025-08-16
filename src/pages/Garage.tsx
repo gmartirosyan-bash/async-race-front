@@ -1,16 +1,15 @@
 import { useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
 import { addCar } from "../redux/features/garageSlice"
-import type { RootState } from '../redux/store'
+import { useAppDispatch, useAppSelector } from "../redux/hooks"
 import type { Car } from "../redux/features/garageSlice"
 
 export default function Garage() {
-  const cars = useSelector((state: RootState) => state.garage.cars)
+  const cars = useAppSelector(state => state.garage.cars)
 
   const [name, setName] = useState<string>('')
   const [color, setColor] = useState<string>('#000000')
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const handleAddCar = (e: React.FormEvent) => {
     e.preventDefault()
