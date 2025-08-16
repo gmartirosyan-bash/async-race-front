@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
-interface Car {
+export interface Car {
   id: number
   name: string
   color: string
@@ -22,7 +22,12 @@ const initialState: GarageState = {
 const garageSlice = createSlice({
   name: 'garage',
   initialState,
-  reducers: {}
+  reducers: {
+    addCar(state, action: PayloadAction<Car>){
+      state.cars.push(action.payload)
+    }
+  }
 })
 
+export const { addCar } = garageSlice.actions
 export default garageSlice.reducer
