@@ -1,13 +1,13 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export interface Car {
-  id: number
-  name: string
-  color: string
+  id: number;
+  name: string;
+  color: string;
 }
 
 interface GarageState {
-  cars: Car[]
+  cars: Car[];
 }
 
 const initialState: GarageState = {
@@ -17,17 +17,17 @@ const initialState: GarageState = {
     { id: 3, name: 'Mersedes', color: '#6c779f' },
     { id: 4, name: 'Ford', color: '#ef3c40' },
   ],
-}
+};
 
 const garageSlice = createSlice({
   name: 'garage',
   initialState,
   reducers: {
-    addCar(state, action: PayloadAction<Car>){
-      state.cars.push(action.payload)
-    }
-  }
-})
+    addCar(state, action: PayloadAction<Car>) {
+      state.cars.push(action.payload);
+    },
+  },
+});
 
-export const { addCar } = garageSlice.actions
-export default garageSlice.reducer
+export const { addCar } = garageSlice.actions;
+export default garageSlice.reducer;

@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   winners: [
@@ -6,14 +6,14 @@ const initialState = {
       id: 1,
       wins: 1,
       time: 10,
-    }
-  ]
-}
+    },
+  ],
+};
 
 const winnersSlice = createSlice({
   name: 'winners',
   initialState,
   reducers: {},
-})
+});
 
-export default winnersSlice.reducer
+export default winnersSlice.reducer;
