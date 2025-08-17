@@ -1,10 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-
-export interface Car {
-  id: number;
-  name: string;
-  color: string;
-}
+import type { Car } from '../../types/car';
 
 interface GarageState {
   cars: Car[];

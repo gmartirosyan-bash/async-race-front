@@ -6,7 +6,7 @@ import { getCars } from '../api/cars';
 
 import GaragePanel from '../components/Garage/GaragePanel';
 
-import type { Car } from '../redux/features/garageSlice';
+import type { Car } from '../types/car';
 
 export default function Garage() {
   const cars = useAppSelector((state) => state.garage.cars);
