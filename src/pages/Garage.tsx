@@ -2,20 +2,8 @@ import { useState } from "react"
 import { addCar } from "../redux/features/garageSlice"
 import { useAppDispatch, useAppSelector } from "../redux/hooks"
 import { Link } from "react-router-dom"
+import carSvgs from "../assets/carSvgs"
 import type { Car } from "../redux/features/garageSlice"
-
-import Car1 from '../assets/car-1.svg?react'
-import Car2 from '../assets/car-2.svg?react'
-import Car3 from '../assets/car-3.svg?react'
-import Car4 from '../assets/car-4.svg?react'
-import Car5 from '../assets/car-5.svg?react'
-import Car6 from '../assets/car-6.svg?react'
-import Car7 from '../assets/car-7.svg?react'
-import Car8 from '../assets/car-8.svg?react'
-import Car9 from '../assets/car-9.svg?react'
-
-
-const carSvgs = [Car1, Car2, Car3, Car4, Car5, Car6, Car7, Car8, Car9];
 
 export default function Garage() {
   const cars = useAppSelector(state => state.garage.cars)
