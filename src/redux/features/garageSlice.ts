@@ -11,12 +11,7 @@ interface GarageState {
 }
 
 const initialState: GarageState = {
-  cars: [
-    { id: 1, name: 'Tesla', color: '#e6e6fa' },
-    { id: 2, name: 'BMW', color: '#fede00' },
-    { id: 3, name: 'Mersedes', color: '#6c779f' },
-    { id: 4, name: 'Ford', color: '#ef3c40' },
-  ],
+  cars: [],
 };
 
 const garageSlice = createSlice({

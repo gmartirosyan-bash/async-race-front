@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { addCar, removeCar } from '../redux/features/garageSlice';
+import { useEffect, useState } from 'react';
+import { setCars, addCar, removeCar } from '../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import carSvgs from '../assets/carSvgs';
-import type { Car } from '../redux/features/garageSlice';
+import { getCars } from '../api/cars';
+
 import GaragePanel from '../components/Garage/GaragePanel';
+
+import type { Car } from '../redux/features/garageSlice';
 
 export default function Garage() {
   const cars = useAppSelector((state) => state.garage.cars);
@@ -12,6 +15,14 @@ export default function Garage() {
   const [color, setColor] = useState<string>('#ff0000');
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const fetchCars = async () => {
+      const data = await getCars();
+      dispatch(setCars(data));
+    };
+    fetchCars();
+  }, [dispatch]);
 
   const handleAddCar = (e: React.FormEvent) => {
     e.preventDefault();
