@@ -5,10 +5,14 @@ import type { Car } from '../../types/car';
 
 interface GarageState {
   cars: Car[];
+  error: string | null;
+  loading: boolean;
 }
 
 const initialState: GarageState = {
   cars: [],
+  error: null,
+  loading: false,
 };
 
 export const fetchCars = createAsyncThunk<Car[], void>(
@@ -54,14 +58,26 @@ const garageSlice = createSlice({
     setCars(state, action: PayloadAction<Car[]>) {
       state.cars = action.payload;
     },
+    setError(state, action: PayloadAction<string | null>) {
+      state.error = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchCars.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchCars.fulfilled, (state, action: PayloadAction<Car[]>) => {
         state.cars = action.payload;
+        state.loading = false;
       })
-      .addCase(fetchCars.rejected, (_, action) => {
-        handleApiError(action.payload, 'Failed to fetch the cars. Please try again.');
+      .addCase(fetchCars.rejected, (state, action) => {
+        const msg: string = handleApiError(
+          action.payload,
+          'Failed to fetch the cars. Please try again.',
+        );
+        state.error = msg;
+        state.loading = false;
       })
       .addCase(addCar.fulfilled, (status, action: PayloadAction<Car>) => {
         status.cars.push(action.payload);
@@ -78,5 +94,5 @@ const garageSlice = createSlice({
   },
 });
 
-export const { setCars } = garageSlice.actions;
+export const { setCars, setError } = garageSlice.actions;
 export default garageSlice.reducer;
