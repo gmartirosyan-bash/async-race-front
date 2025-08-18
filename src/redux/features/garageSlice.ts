@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import type { Car } from '../../types/car';
+import handleApiError from '../../utils/handleApiError';
 import carsApi from '../../api/cars';
+import type { Car } from '../../types/car';
 
 interface GarageState {
   cars: Car[];
@@ -60,19 +61,19 @@ const garageSlice = createSlice({
         state.cars = action.payload;
       })
       .addCase(fetchCars.rejected, (_, action) => {
-        console.error(action.payload);
+        handleApiError(action.payload, 'Failed to fetch the cars. Please try again.');
       })
       .addCase(addCar.fulfilled, (status, action: PayloadAction<Car>) => {
         status.cars.push(action.payload);
       })
       .addCase(addCar.rejected, (_, action) => {
-        console.error(action.payload);
+        handleApiError(action.payload, 'Failed to add a cars. Please try again.');
       })
       .addCase(removeCar.fulfilled, (status, action: PayloadAction<number>) => {
         status.cars = status.cars.filter((car) => car.id !== action.payload);
       })
       .addCase(removeCar.rejected, (_, action) => {
-        console.error(action.payload);
+        handleApiError(action.payload, 'Failed to remove the car. Please try again.');
       });
   },
 });
