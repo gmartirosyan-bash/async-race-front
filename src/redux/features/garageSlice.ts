@@ -7,12 +7,14 @@ interface GarageState {
   cars: Car[];
   error: string | null;
   loading: boolean;
+  selected: Car | null;
 }
 
 const initialState: GarageState = {
   cars: [],
   error: null,
   loading: false,
+  selected: null,
 };
 
 export const fetchCars = createAsyncThunk<Car[], void, { rejectValue: unknown }>(
@@ -62,6 +64,9 @@ const garageSlice = createSlice({
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
+    setSelected(state, action: PayloadAction<Car | null>) {
+      state.selected = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -92,5 +97,5 @@ const garageSlice = createSlice({
   },
 });
 
-export const { setCars, setError } = garageSlice.actions;
+export const { setCars, setError, setSelected } = garageSlice.actions;
 export default garageSlice.reducer;

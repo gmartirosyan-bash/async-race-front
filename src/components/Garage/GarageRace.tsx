@@ -1,9 +1,11 @@
-import { removeCar } from '../../redux/features/garageSlice';
+import { removeCar, setSelected } from '../../redux/features/garageSlice';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import carSvgs from '../../assets/carSvgs';
+import type { Car } from '../../types/car';
 
 export default function GarageRace() {
   const cars = useAppSelector((state) => state.garage.cars);
+  const selected = useAppSelector((state) => state.garage.selected);
 
   const dispatch = useAppDispatch();
 
@@ -11,15 +13,29 @@ export default function GarageRace() {
     dispatch(removeCar(id));
   };
 
+  const handleSelectCar = (car: Car) => {
+    if (selected?.id === car.id) {
+      dispatch(setSelected(null));
+    } else {
+      dispatch(setSelected(car));
+    }
+  };
+
   return (
     <div>
       {cars.map((car, i) => {
         const Car = carSvgs[i % 9];
         return (
-          <div key={car.id} className="flex items-center border-b-white border-b-4">
+          <div
+            key={car.id}
+            className={`flex items-center border-b-white border-b-4 ${!selected || selected?.id === car.id ? 'opacity-100' : 'opacity-50'}`}
+          >
             <div className="flex items-center gap-4">
               <div className="flex flex-col gap-3">
-                <button className="px-3 font-semibold rounded-2xl bg-yellow-400 text-black">
+                <button
+                  onClick={() => handleSelectCar(car)}
+                  className="px-3 font-semibold rounded-2xl bg-yellow-400 text-black"
+                >
                   SELECT
                 </button>
                 <button

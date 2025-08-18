@@ -1,13 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addCar } from '../../redux/features/garageSlice';
 import { Link } from 'react-router-dom';
-import { useAppDispatch } from '../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
 export default function GaragePanel() {
   const [name, setName] = useState<string>('');
   const [color, setColor] = useState<string>('#ff0000');
 
+  const selected = useAppSelector((state) => state.garage.selected);
+
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (selected) {
+      setName(selected.name);
+      setColor(selected.color);
+    }
+  }, [selected]);
 
   const handleAddCar = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +31,7 @@ export default function GaragePanel() {
         <Link
           to="/winners"
           className="inline-block bg-transparent p-4 mr-5 mb-5 text-red-500
-            border-2 border-red-400 outline-2 outline-red-700 rounded-2xl"
+            border-1 ring-3 ring-red-700 border-red-700 outline-2 outline-red-400 rounded-2xl"
         >
           TO WINNERS
         </Link>
@@ -38,7 +47,7 @@ export default function GaragePanel() {
           <button className="py-1 px-2 mr-6 rounded-md">Reset</button>
           <button className="py-1 px-2 mr-6 rounded-md">Generate Cars</button>
         </div>
-        <div className="">
+        <div>
           <form onSubmit={handleAddCar}>
             <label htmlFor="car-name" className="sr-only">
               Car Name
