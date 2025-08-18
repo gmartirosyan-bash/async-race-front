@@ -31,12 +31,12 @@ export default function GarageRace() {
             className={`flex items-center border-b-white border-b-4 ${!selected || selected?.id === car.id ? 'opacity-100' : 'opacity-50'}`}
           >
             <div className="flex items-center gap-4">
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 max-w-25">
                 <button
                   onClick={() => handleSelectCar(car)}
                   className="px-3 font-semibold rounded-2xl bg-yellow-400 text-black"
                 >
-                  SELECT
+                  {selected && selected.id === car.id ? 'UNDO' : 'SELECT'}
                 </button>
                 <button
                   onClick={() => handleRemoveCar(car.id)}

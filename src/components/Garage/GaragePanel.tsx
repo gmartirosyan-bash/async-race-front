@@ -15,6 +15,9 @@ export default function GaragePanel() {
     if (selected) {
       setName(selected.name);
       setColor(selected.color);
+    } else {
+      setName('');
+      setColor('#ff0000');
     }
   }, [selected]);
 
@@ -71,8 +74,8 @@ export default function GaragePanel() {
               value={color}
               onChange={(e) => setColor(e.target.value)}
             />
-            <button className="px-2 py-1 rounded-md" type="submit">
-              Add Car
+            <button className="px-2 py-1 rounded-md font-semibold text-xl" type="submit">
+              {selected ? 'UPDATE' : 'CREATE'}
             </button>
           </form>
         </div>
