@@ -1,4 +1,4 @@
-export default function (error: unknown, fallbackMessage: string = 'Something went wrong') {
+export default function (error: unknown, fallbackMessage: string = 'Something went wrong'): string {
   console.error('API Error', error);
 
   if (error instanceof TypeError && error.message === 'Failed to fetch') {

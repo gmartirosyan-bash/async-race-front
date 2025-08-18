@@ -15,7 +15,7 @@ const initialState: GarageState = {
   loading: false,
 };
 
-export const fetchCars = createAsyncThunk<Car[], void>(
+export const fetchCars = createAsyncThunk<Car[], void, { rejectValue: unknown }>(
   'garage/fetchCars',
   async (_, { rejectWithValue }) => {
     try {
@@ -27,19 +27,20 @@ export const fetchCars = createAsyncThunk<Car[], void>(
   },
 );
 
-export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
-  'garage/addCar',
-  async (newCar, { rejectWithValue }) => {
-    try {
-      const data = await carsApi.addCarApi(newCar);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err);
-    }
-  },
-);
+export const addCar = createAsyncThunk<
+  Car,
+  { name: string; color: string },
+  { rejectValue: unknown }
+>('garage/addCar', async (newCar, { rejectWithValue }) => {
+  try {
+    const data = await carsApi.addCarApi(newCar);
+    return data;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
+});
 
-export const removeCar = createAsyncThunk<number, number>(
+export const removeCar = createAsyncThunk<number, number, { rejectValue: unknown }>(
   'garage/removeCar',
   async (id, { rejectWithValue }) => {
     try {
@@ -66,30 +67,27 @@ const garageSlice = createSlice({
     builder
       .addCase(fetchCars.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchCars.fulfilled, (state, action: PayloadAction<Car[]>) => {
         state.cars = action.payload;
         state.loading = false;
       })
       .addCase(fetchCars.rejected, (state, action) => {
-        const msg: string = handleApiError(
-          action.payload,
-          'Failed to fetch the cars. Please try again.',
-        );
-        state.error = msg;
+        state.error = handleApiError(action.payload, 'Failed to fetch the cars. Please try again.');
         state.loading = false;
       })
-      .addCase(addCar.fulfilled, (status, action: PayloadAction<Car>) => {
-        status.cars.push(action.payload);
+      .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
+        state.cars.push(action.payload);
       })
-      .addCase(addCar.rejected, (_, action) => {
-        handleApiError(action.payload, 'Failed to add a cars. Please try again.');
+      .addCase(addCar.rejected, (state, action) => {
+        state.error = handleApiError(action.payload, 'Failed to add a car. Please try again.');
       })
-      .addCase(removeCar.fulfilled, (status, action: PayloadAction<number>) => {
-        status.cars = status.cars.filter((car) => car.id !== action.payload);
+      .addCase(removeCar.fulfilled, (state, action: PayloadAction<number>) => {
+        state.cars = state.cars.filter((car) => car.id !== action.payload);
       })
-      .addCase(removeCar.rejected, (_, action) => {
-        handleApiError(action.payload, 'Failed to remove the car. Please try again.');
+      .addCase(removeCar.rejected, (state, action) => {
+        state.error = handleApiError(action.payload, 'Failed to remove the car. Please try again.');
       });
   },
 });

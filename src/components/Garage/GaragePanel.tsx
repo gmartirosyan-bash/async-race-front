@@ -1,20 +1,21 @@
+import { useState } from 'react';
+import { addCar } from '../../redux/features/garageSlice';
 import { Link } from 'react-router-dom';
+import { useAppDispatch } from '../../redux/hooks';
 
-interface GaragePanelProps {
-  handleAddCar: (e: React.FormEvent) => void;
-  setName: (val: string) => void;
-  setColor: (val: string) => void;
-  name: string;
-  color: string;
-}
+export default function GaragePanel() {
+  const [name, setName] = useState<string>('');
+  const [color, setColor] = useState<string>('#ff0000');
 
-export default function GaragePanel({
-  handleAddCar,
-  setName,
-  setColor,
-  name,
-  color,
-}: GaragePanelProps) {
+  const dispatch = useAppDispatch();
+
+  const handleAddCar = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !color.trim()) return;
+    dispatch(addCar({ name, color }));
+    setName('');
+  };
+
   return (
     <div className="mt-10 bg-[url('/Async-race.png')]  bg-center bg-no-repeat bg-contain h-70">
       <div className="ml-10">
