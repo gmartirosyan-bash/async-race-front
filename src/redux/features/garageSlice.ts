@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import type { Car } from '../../types/car';
-import { getCars } from '../../api/cars';
+import carsApi from '../../api/cars';
 
 interface GarageState {
   cars: Car[];
@@ -10,11 +10,11 @@ const initialState: GarageState = {
   cars: [],
 };
 
-export const fetchCars = createAsyncThunk<Car[]>(
+export const fetchCars = createAsyncThunk<Car[], void>(
   'garage/fetchCars',
   async (_, { rejectWithValue }) => {
     try {
-      const data = await getCars();
+      const data = await carsApi.getCarsApi();
       return data;
     } catch (err) {
       return rejectWithValue(err);
@@ -22,25 +22,17 @@ export const fetchCars = createAsyncThunk<Car[]>(
   },
 );
 
-export const addCar = createAsyncThunk<
-  Car,
-  { name: string; color: string },
-  { rejectValue: string }
->('garage/addCar', async (newCar, { rejectWithValue }) => {
-  try {
-    const res = await fetch('http://localhost:3000/garage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newCar),
-    });
-
-    if (!res.ok) return rejectWithValue('Failed to add car');
-
-    return (await res.json()) as Car;
-  } catch {
-    return rejectWithValue('Network error');
-  }
-});
+export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
+  'garage/addCar',
+  async (newCar, { rejectWithValue }) => {
+    try {
+      const data = await carsApi.addCarApi(newCar);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  },
+);
 
 const garageSlice = createSlice({
   name: 'garage',
@@ -59,6 +51,12 @@ const garageSlice = createSlice({
         state.cars = action.payload;
       })
       .addCase(fetchCars.rejected, (_, action) => {
+        console.error(action.payload);
+      })
+      .addCase(addCar.fulfilled, (status, action: PayloadAction<Car>) => {
+        status.cars.push(action.payload);
+      })
+      .addCase(addCar.rejected, (_, action) => {
         console.error(action.payload);
       });
   },
