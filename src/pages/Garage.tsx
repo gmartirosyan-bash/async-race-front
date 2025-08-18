@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GaragePanel from '../components/Garage/GaragePanel';
 import GarageRace from '../components/Garage/GarageRace';
 import CustomMsg from '../components/CustomMsg';
+import Border from '../components/Garage/Border';
 import LoadingIndicator from '../components/LoadingIndicator';
 
 export default function Garage() {
@@ -22,12 +23,9 @@ export default function Garage() {
     <>
       <div>
         <GaragePanel />
-
-        <div className="w-300 m-auto h-15 bg-[length:60px] bg-[url('/border.png')] bg-repeat-x bg-center"></div>
-
+        <Border />
         <GarageRace />
-
-        <div className="w-300 m-auto h-15 bg-[length:60px] bg-[url('/border.png')] bg-repeat-x bg-center"></div>
+        <Border />
       </div>
     </>
   );
