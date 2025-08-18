@@ -54,6 +54,19 @@ export const removeCar = createAsyncThunk<number, number, { rejectValue: unknown
   },
 );
 
+export const updateCar = createAsyncThunk<
+  Car,
+  { id: number; newCar: { name: string; color: string } },
+  { rejectValue: unknown }
+>('garage/updateCar', async ({ id, newCar }, { rejectWithValue }) => {
+  try {
+    const data = await carsApi.updateCarApi(id, newCar);
+    return data;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
+});
+
 const garageSlice = createSlice({
   name: 'garage',
   initialState,
@@ -93,6 +106,12 @@ const garageSlice = createSlice({
       })
       .addCase(removeCar.rejected, (state, action) => {
         state.error = handleApiError(action.payload, 'Failed to remove the car. Please try again.');
+      })
+      .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
+        state.cars = state.cars.map((car) => (car.id === action.payload.id ? action.payload : car));
+      })
+      .addCase(updateCar.rejected, (state, action) => {
+        state.error = handleApiError(action.payload, 'Failed to update the car. Please try again.');
       });
   },
 });

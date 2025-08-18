@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { addCar } from '../../redux/features/garageSlice';
+import { addCar, setSelected, updateCar } from '../../redux/features/garageSlice';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
@@ -24,7 +24,12 @@ export default function GaragePanel() {
   const handleAddCar = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !color.trim()) return;
-    dispatch(addCar({ name, color }));
+    if (selected) {
+      dispatch(updateCar({ id: selected.id, newCar: { name, color } }));
+      dispatch(setSelected(null));
+    } else {
+      dispatch(addCar({ name, color }));
+    }
     setName('');
   };
 

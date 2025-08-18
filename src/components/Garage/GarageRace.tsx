@@ -36,7 +36,7 @@ export default function GarageRace() {
                   onClick={() => handleSelectCar(car)}
                   className="px-3 font-semibold rounded-2xl bg-yellow-400 text-black"
                 >
-                  {selected && selected.id === car.id ? 'UNDO' : 'SELECT'}
+                  {selected && selected.id === car.id ? 'UNSET' : 'SELECT'}
                 </button>
                 <button
                   onClick={() => handleRemoveCar(car.id)}
