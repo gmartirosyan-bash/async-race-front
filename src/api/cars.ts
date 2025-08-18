@@ -18,4 +18,11 @@ const addCarApi = async (carObj: { name: string; color: string }) => {
   return (await res.json()) as Car;
 };
 
-export default { getCarsApi, addCarApi };
+const removeCarApi = async (id: number) => {
+  const res = await fetch(`${URL}/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw Error(`failed to remove the car: ${res.status}`);
+};
+
+export default { getCarsApi, addCarApi, removeCarApi };

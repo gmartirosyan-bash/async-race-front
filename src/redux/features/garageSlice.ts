@@ -34,15 +34,24 @@ export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
   },
 );
 
+export const removeCar = createAsyncThunk<number, number>(
+  'garage/removeCar',
+  async (id, { rejectWithValue }) => {
+    try {
+      await carsApi.removeCarApi(id);
+      return id;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  },
+);
+
 const garageSlice = createSlice({
   name: 'garage',
   initialState,
   reducers: {
     setCars(state, action: PayloadAction<Car[]>) {
       state.cars = action.payload;
-    },
-    removeCar(state, action: PayloadAction<number>) {
-      state.cars = state.cars.filter((car) => car.id !== action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -58,9 +67,15 @@ const garageSlice = createSlice({
       })
       .addCase(addCar.rejected, (_, action) => {
         console.error(action.payload);
+      })
+      .addCase(removeCar.fulfilled, (status, action: PayloadAction<number>) => {
+        status.cars = status.cars.filter((car) => car.id !== action.payload);
+      })
+      .addCase(removeCar.rejected, (_, action) => {
+        console.error(action.payload);
       });
   },
 });
 
-export const { setCars, removeCar } = garageSlice.actions;
+export const { setCars } = garageSlice.actions;
 export default garageSlice.reducer;
