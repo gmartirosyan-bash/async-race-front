@@ -25,16 +25,9 @@ export default function GarageCar({ car }: GarageProps) {
       carRef.current.style.left = computed;
     }
   }, [movingCars, carState]);
-  const handleStop = () => {
-    if (carRef.current) {
-      const computed = window.getComputedStyle(carRef.current).left;
-      carRef.current.style.transition = 'none';
-      carRef.current.style.left = computed;
-    }
-  };
+
   return (
     <>
-      <button onClick={handleStop}>test</button>
       <div className="relative w-full h-20 overflow-hidden">
         <div
           ref={carRef}
