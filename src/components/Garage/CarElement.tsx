@@ -1,6 +1,7 @@
 import { useAppSelector } from '../../redux/hooks';
 import carSvgs from '../../assets/carSvgs';
 import type { Car } from '../../types/car';
+import { useEffect, useRef } from 'react';
 
 interface GarageProps {
   car: Car;
@@ -8,15 +9,35 @@ interface GarageProps {
 
 export default function GarageCar({ car }: GarageProps) {
   const movingCars = useAppSelector((state) => state.garage.moving);
+  const carRef = useRef<HTMLDivElement>(null);
 
   const CarSvg = carSvgs[car.id % 9];
   const isMoving = movingCars.some((moving) => moving.id === car.id);
   const speed = movingCars.find((moving) => moving.id === car.id)?.duration;
+  const carState = movingCars.find((m) => m.id === car.id);
 
+  useEffect(() => {
+    if (!carRef.current) return;
+
+    if (carState?.broke) {
+      const computed = window.getComputedStyle(carRef.current).left;
+      carRef.current.style.transition = 'none';
+      carRef.current.style.left = computed;
+    }
+  }, [movingCars, carState]);
+  const handleStop = () => {
+    if (carRef.current) {
+      const computed = window.getComputedStyle(carRef.current).left;
+      carRef.current.style.transition = 'none';
+      carRef.current.style.left = computed;
+    }
+  };
   return (
     <>
+      <button onClick={handleStop}>test</button>
       <div className="relative w-full h-20 overflow-hidden">
         <div
+          ref={carRef}
           style={{
             left: isMoving ? '85%' : '0%',
             transitionDuration: isMoving ? `${speed}ms` : '0s',
