@@ -1,13 +1,15 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import handleApiError from '../../utils/handleApiError';
 import carsApi from '../../api/cars';
-import type { Car } from '../../types/car';
+import engineApi from '../../api/race';
+import type { Car, Start } from '../../types/car';
 
 interface GarageState {
   cars: Car[];
   error: string | null;
   loading: boolean;
   selected: Car | null;
+  time: number | null;
 }
 
 const initialState: GarageState = {
@@ -15,6 +17,7 @@ const initialState: GarageState = {
   error: null,
   loading: false,
   selected: null,
+  time: null,
 };
 
 export const fetchCars = createAsyncThunk<Car[], void, { rejectValue: unknown }>(
@@ -67,6 +70,32 @@ export const updateCar = createAsyncThunk<
   }
 });
 
+export const startCar = createAsyncThunk<Start, number, { rejectValue: unknown }>(
+  'garage/startCar',
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = (await engineApi.raceApi(id, 'started')) as Start;
+      return data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  },
+);
+
+export const driveCar = createAsyncThunk<Start, number, { rejectValue: unknown }>(
+  'garage/driveCar',
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      await dispatch(startCar(id)).unwrap();
+
+      const data = (await engineApi.raceApi(id, 'drive')) as Start;
+      return data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  },
+);
+
 const garageSlice = createSlice({
   name: 'garage',
   initialState,
@@ -112,6 +141,18 @@ const garageSlice = createSlice({
       })
       .addCase(updateCar.rejected, (state, action) => {
         state.error = handleApiError(action.payload, 'Failed to update the car. Please try again.');
+      })
+      .addCase(startCar.fulfilled, (state, action: PayloadAction<Start>) => {
+        state.time = action.payload.distance / action.payload.velocity;
+      })
+      .addCase(startCar.rejected, (state, action) => {
+        state.error = handleApiError(action.payload, 'Failed to start the car. Please try again.');
+      })
+      .addCase(driveCar.fulfilled, (state, action: PayloadAction<Start>) => {
+        state.time = action.payload.distance / action.payload.velocity;
+      })
+      .addCase(driveCar.rejected, (state, action) => {
+        state.error = handleApiError(action.payload, '');
       });
   },
 });

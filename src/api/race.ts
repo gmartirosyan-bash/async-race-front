@@ -1,19 +1,14 @@
+import type { Start } from '../types/car';
+
 const URL = 'http://localhost:3000/engine';
 
-const raceApi = async (id: number, status: 'started' | 'stopped') => {
+const raceApi = async (id: number, status: 'started' | 'stopped' | 'drive') => {
   const res = await fetch(`${URL}?status=${status}&id=${id}`, {
     method: 'PATCH',
   });
   if (!res.ok) throw new Error(`Failed to ${status} the car: ${res.status}`);
-  return (await res.json()) as { velocity: number; distance: number };
+  if (status === 'started') return (await res.json()) as Start;
+  else if (status === 'drive') return (await res.json()) as { success: boolean };
 };
 
-const driveApi = async (id: number, status: 'drive') => {
-  const res = await fetch(`${URL}?status=${status}&id=${id}`, {
-    method: 'PATCH',
-  });
-  if (!res.ok) throw new Error(`Failed to ${status} the car: ${res.status}`);
-  return (await res.json()) as { success: true };
-};
-
-export default { raceApi, driveApi };
+export default { raceApi };

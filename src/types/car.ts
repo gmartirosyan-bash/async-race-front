@@ -3,3 +3,8 @@ export interface Car {
   name: string;
   color: string;
 }
+
+export interface Start {
+  velocity: number;
+  distance: number;
+}
