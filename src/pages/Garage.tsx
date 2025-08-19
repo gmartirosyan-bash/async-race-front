@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { fetchCars } from '../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GaragePanel from '../components/Garage/GaragePanel';
-import GarageRace from '../components/Garage/GarageRace';
+import GarageCars from '../components/Garage/GarageCars';
 import CustomMsg from '../components/CustomMsg';
 import Border from '../components/Garage/Border';
 import LoadingIndicator from '../components/LoadingIndicator';
@@ -24,7 +24,7 @@ export default function Garage() {
       <div className="overflow-hidden">
         <GaragePanel />
         <Border />
-        <GarageRace />
+        <GarageCars />
         <Border />
       </div>
     </>
