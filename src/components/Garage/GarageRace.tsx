@@ -1,4 +1,4 @@
-import { removeCar, setSelected } from '../../redux/features/garageSlice';
+import { driveCar, removeCar, setSelected } from '../../redux/features/garageSlice';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import carSvgs from '../../assets/carSvgs';
 import type { Car } from '../../types/car';
@@ -6,6 +6,7 @@ import type { Car } from '../../types/car';
 export default function GarageRace() {
   const cars = useAppSelector((state) => state.garage.cars);
   const selected = useAppSelector((state) => state.garage.selected);
+  const movingCars = useAppSelector((state) => state.garage.moving);
 
   const dispatch = useAppDispatch();
 
@@ -21,10 +22,17 @@ export default function GarageRace() {
     }
   };
 
+  const handleDriveCar = (id: number) => {
+    dispatch(driveCar(id));
+  };
+
   return (
     <div>
       {cars.map((car, i) => {
         const Car = carSvgs[i % 9];
+        const isMoving = movingCars.some((moving) => moving.id === car.id);
+        const speed = movingCars.find((moving) => moving.duration)?.duration;
+        if (isMoving) console.log('show', speed);
         return (
           <div
             key={car.id}
@@ -46,7 +54,10 @@ export default function GarageRace() {
                 </button>
               </div>
               <div className="flex flex-col gap-3">
-                <button className="px-3 font-semibold rounded-2xl bg-green-700 text-black">
+                <button
+                  onClick={() => handleDriveCar(car.id)}
+                  className="px-3 font-semibold rounded-2xl bg-green-700 text-black"
+                >
                   START
                 </button>
                 <button className="px-3 font-semibold rounded-2xl bg-red-700 text-black">
@@ -54,8 +65,20 @@ export default function GarageRace() {
                 </button>
               </div>
             </div>
-            <Car className="w-40 h-20" fill={car.color} />
-            <p className="ml-2">{car.name}</p>
+            {/* <Car className="w-40 h-20" fill={car.color} /> */}
+            <div className="relative w-full h-20" style={{ overflow: 'hidden' }}>
+              <Car
+                className="absolute top-0 transition-all ease-linear"
+                fill={car.color}
+                style={{
+                  left: isMoving ? '85%' : '0%',
+                  transitionDuration: `${speed}s`,
+                  width: '160px',
+                  height: '80px',
+                }}
+              />
+            </div>
+            <p className="absolute left-85 -z-40 text-5xl opacity-40">{car.name}</p>
           </div>
         );
       })}

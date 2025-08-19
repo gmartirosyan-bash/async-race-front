@@ -21,7 +21,7 @@ export default function Garage() {
   if (error) return <CustomMsg />;
   return (
     <>
-      <div>
+      <div className="overflow-hidden">
         <GaragePanel />
         <Border />
         <GarageRace />

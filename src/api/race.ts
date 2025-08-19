@@ -6,7 +6,7 @@ const raceApi = async (id: number, status: 'started' | 'stopped' | 'drive') => {
   const res = await fetch(`${URL}?status=${status}&id=${id}`, {
     method: 'PATCH',
   });
-  if (!res.ok) throw new Error(`Failed to ${status} the car: ${res.status}`);
+  if (!res.ok) throw res;
   if (status === 'started') return (await res.json()) as Start;
   else if (status === 'drive') return (await res.json()) as { success: boolean };
 };

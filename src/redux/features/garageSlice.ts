@@ -4,12 +4,17 @@ import carsApi from '../../api/cars';
 import engineApi from '../../api/race';
 import type { Car, Start } from '../../types/car';
 
+interface MovingCar {
+  id: number;
+  duration: number;
+}
+
 interface GarageState {
   cars: Car[];
   error: string | null;
   loading: boolean;
   selected: Car | null;
-  time: number | null;
+  moving: MovingCar[];
 }
 
 const initialState: GarageState = {
@@ -17,7 +22,7 @@ const initialState: GarageState = {
   error: null,
   loading: false,
   selected: null,
-  time: null,
+  moving: [],
 };
 
 export const fetchCars = createAsyncThunk<Car[], void, { rejectValue: unknown }>(
@@ -70,28 +75,29 @@ export const updateCar = createAsyncThunk<
   }
 });
 
-export const startCar = createAsyncThunk<Start, number, { rejectValue: unknown }>(
+export const startCar = createAsyncThunk<MovingCar, number, { rejectValue: unknown }>(
   'garage/startCar',
   async (id, { rejectWithValue }) => {
     try {
       const data = (await engineApi.raceApi(id, 'started')) as Start;
-      return data;
+      const duration = data.distance / data.velocity / 1000;
+      return { id, duration };
     } catch (err) {
       return rejectWithValue(err);
     }
   },
 );
 
-export const driveCar = createAsyncThunk<Start, number, { rejectValue: unknown }>(
+export const driveCar = createAsyncThunk<Start | void, number>(
   'garage/driveCar',
-  async (id, { dispatch, rejectWithValue }) => {
+  async (id, { dispatch }) => {
     try {
       await dispatch(startCar(id)).unwrap();
 
       const data = (await engineApi.raceApi(id, 'drive')) as Start;
       return data;
     } catch (err) {
-      return rejectWithValue(err);
+      console.error('Failed to drive the car', err);
     }
   },
 );
@@ -142,18 +148,15 @@ const garageSlice = createSlice({
       .addCase(updateCar.rejected, (state, action) => {
         state.error = handleApiError(action.payload, 'Failed to update the car. Please try again.');
       })
-      .addCase(startCar.fulfilled, (state, action: PayloadAction<Start>) => {
-        state.time = action.payload.distance / action.payload.velocity;
+      .addCase(startCar.fulfilled, (state, action: PayloadAction<MovingCar>) => {
+        state.moving.push(action.payload);
       })
       .addCase(startCar.rejected, (state, action) => {
         state.error = handleApiError(action.payload, 'Failed to start the car. Please try again.');
-      })
-      .addCase(driveCar.fulfilled, (state, action: PayloadAction<Start>) => {
-        state.time = action.payload.distance / action.payload.velocity;
-      })
-      .addCase(driveCar.rejected, (state, action) => {
-        state.error = handleApiError(action.payload, '');
       });
+    // .addCase(driveCar.fulfilled, (state, action: PayloadAction<Start | void>) => {
+    //   if (action.payload) state.time = action.payload.distance / action.payload.velocity;
+    // });
   },
 });
 
