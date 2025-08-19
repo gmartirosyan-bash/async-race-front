@@ -1,4 +1,4 @@
-import { driveCar, removeCar, setSelected } from '../../redux/features/garageSlice';
+import { driveCar, removeCar, setSelected, stopCar } from '../../redux/features/garageSlice';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import carSvgs from '../../assets/carSvgs';
 import type { Car } from '../../types/car';
@@ -26,13 +26,17 @@ export default function GarageRace() {
     dispatch(driveCar(id));
   };
 
+  const handleStopCar = (id: number) => {
+    dispatch(stopCar(id));
+  };
+
   return (
     <div>
       {cars.map((car, i) => {
         const Car = carSvgs[i % 9];
         const isMoving = movingCars.some((moving) => moving.id === car.id);
-        const speed = movingCars.find((moving) => moving.duration)?.duration;
-        if (isMoving) console.log('show', speed);
+        const speed = movingCars.find((moving) => moving.id === car.id)?.duration;
+        console.log('see', movingCars);
         return (
           <div
             key={car.id}
@@ -60,7 +64,10 @@ export default function GarageRace() {
                 >
                   START
                 </button>
-                <button className="px-3 font-semibold rounded-2xl bg-red-700 text-black">
+                <button
+                  onClick={() => handleStopCar(car.id)}
+                  className="px-3 font-semibold rounded-2xl bg-red-700 text-black"
+                >
                   STOP
                 </button>
               </div>
@@ -72,7 +79,7 @@ export default function GarageRace() {
                 fill={car.color}
                 style={{
                   left: isMoving ? '85%' : '0%',
-                  transitionDuration: `${speed}s`,
+                  transitionDuration: isMoving ? `${speed}ms` : '0s',
                   width: '160px',
                   height: '80px',
                 }}

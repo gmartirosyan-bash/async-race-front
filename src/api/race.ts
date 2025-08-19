@@ -7,8 +7,8 @@ const raceApi = async (id: number, status: 'started' | 'stopped' | 'drive') => {
     method: 'PATCH',
   });
   if (!res.ok) throw res;
-  if (status === 'started') return (await res.json()) as Start;
-  else if (status === 'drive') return (await res.json()) as { success: boolean };
+  if (status === 'drive') return (await res.json()) as { success: boolean };
+  else return (await res.json()) as Start;
 };
 
 export default { raceApi };

@@ -80,7 +80,7 @@ export const startCar = createAsyncThunk<MovingCar, number, { rejectValue: unkno
   async (id, { rejectWithValue }) => {
     try {
       const data = (await engineApi.raceApi(id, 'started')) as Start;
-      const duration = data.distance / data.velocity / 1000;
+      const duration = data.distance / data.velocity;
       return { id, duration };
     } catch (err) {
       return rejectWithValue(err);
@@ -101,6 +101,15 @@ export const driveCar = createAsyncThunk<Start | void, number>(
     }
   },
 );
+
+export const stopCar = createAsyncThunk<number | void, number>('garage/stopCar', async (id) => {
+  try {
+    await engineApi.raceApi(id, 'stopped');
+    return id;
+  } catch (err) {
+    console.error('Failed to stop the car', err);
+  }
+});
 
 const garageSlice = createSlice({
   name: 'garage',
@@ -153,6 +162,9 @@ const garageSlice = createSlice({
       })
       .addCase(startCar.rejected, (state, action) => {
         state.error = handleApiError(action.payload, 'Failed to start the car. Please try again.');
+      })
+      .addCase(stopCar.fulfilled, (state, action) => {
+        if (action) state.moving = state.moving.filter((car) => car.id !== action.payload);
       });
     // .addCase(driveCar.fulfilled, (state, action: PayloadAction<Start | void>) => {
     //   if (action.payload) state.time = action.payload.distance / action.payload.velocity;
