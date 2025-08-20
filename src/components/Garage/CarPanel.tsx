@@ -1,13 +1,16 @@
 import { driveCar, removeCar, setSelected, stopCar } from '../../redux/features/garageSlice';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
+import { useState } from 'react';
 import type { Car } from '../../types/car';
 
-interface GarageProps {
+interface CarPanelProps {
   car: Car;
 }
 
-export default function GarageCar({ car }: GarageProps) {
+export default function CarPanel({ car }: CarPanelProps) {
   const selected = useAppSelector((state) => state.garage.selected);
+
+  const [moving, setMoving] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
@@ -25,6 +28,7 @@ export default function GarageCar({ car }: GarageProps) {
 
   const handleDriveCar = (id: number) => {
     dispatch(driveCar(id));
+    setMoving(true);
   };
 
   const handleStopCar = (id: number) => {
@@ -32,7 +36,7 @@ export default function GarageCar({ car }: GarageProps) {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${moving ? 'pointer-events-none opacity-50' : ''}`}>
       <div className="flex flex-col gap-3 max-w-25">
         <button
           onClick={() => handleSelectCar(car)}
@@ -50,7 +54,7 @@ export default function GarageCar({ car }: GarageProps) {
       <div className="flex flex-col gap-3">
         <button
           onClick={() => handleDriveCar(car.id)}
-          className="px-3 font-semibold rounded-2xl bg-green-700 text-black"
+          className="px-3 font-semibold rounded-2xl bg-green-500 text-black"
         >
           START
         </button>

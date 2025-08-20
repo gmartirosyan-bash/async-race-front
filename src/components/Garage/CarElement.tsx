@@ -3,11 +3,11 @@ import carSvgs from '../../assets/carSvgs';
 import type { Car } from '../../types/car';
 import { useEffect, useRef } from 'react';
 
-interface GarageProps {
+interface CarElementProps {
   car: Car;
 }
 
-export default function GarageCar({ car }: GarageProps) {
+export default function CarElement({ car }: CarElementProps) {
   const movingCars = useAppSelector((state) => state.garage.moving);
   const carRef = useRef<HTMLDivElement>(null);
 
