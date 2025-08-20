@@ -75,7 +75,7 @@ export default function CarPanel({ car }: CarPanelProps) {
         <button
           onClick={() => handleDriveCar(car.id)}
           className={`active:scale-90 transform transition-transform duration-20 
-            px-4 text-sm font-semibold rounded-2xl bg-green-500 text-black 
+            px-4 text-sm font-semibold rounded-2xl bg-green-400 text-black 
             border-2 border-gray-600
             ${disableStart ? 'pointer-events-none opacity-50' : ''}`}
         >
@@ -90,7 +90,7 @@ export default function CarPanel({ car }: CarPanelProps) {
         >
           STOP
         </button>
-        <p className="absolute left-85 text-5xl -z-10 opacity-40">{car.name}</p>
+        <p className="absolute left-85 text-5xl -z-10 opacity-40 min-w-200">{car.name}</p>
       </div>
     </div>
   );

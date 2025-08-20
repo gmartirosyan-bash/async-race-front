@@ -18,6 +18,8 @@ interface GarageState {
   selected: Car | null;
   moving: MovingCar[];
   winner: number | null;
+  page: number;
+  carsCount: number;
 }
 
 const initialState: GarageState = {
@@ -27,19 +29,23 @@ const initialState: GarageState = {
   selected: null,
   moving: [],
   winner: null,
+  page: 1,
+  carsCount: 0,
 };
 
-export const fetchCars = createAsyncThunk<Car[], void, { rejectValue: unknown }>(
-  'garage/fetchCars',
-  async (_, { rejectWithValue }) => {
-    try {
-      const data = await carsApi.getCarsApi();
-      return data;
-    } catch (err) {
-      return rejectWithValue(err);
-    }
-  },
-);
+export const fetchCars = createAsyncThunk<
+  { cars: Car[]; totalCount: number },
+  void,
+  { state: RootState; rejectValue: unknown }
+>('garage/fetchCars', async (_, { getState, rejectWithValue }) => {
+  const page = getState().garage.page;
+  try {
+    const data = await carsApi.getCarsApi(page);
+    return data;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
+});
 
 export const addCar = createAsyncThunk<
   Car,
@@ -152,17 +158,35 @@ const garageSlice = createSlice({
     setSelected(state, action: PayloadAction<Car | null>) {
       state.selected = action.payload;
     },
+    nextPage: (state) => {
+      if (state.page === Math.ceil(state.carsCount / 7)) {
+        state.page = 1;
+      } else {
+        state.page += 1;
+      }
+    },
+    prevPage: (state) => {
+      if (state.page === 1) {
+        state.page = Math.ceil(state.carsCount / 7);
+      } else {
+        state.page -= 1;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCars.pending, (state) => {
-        state.loading = true;
+        state.loading = false; //don't really need
         state.error = null;
       })
-      .addCase(fetchCars.fulfilled, (state, action: PayloadAction<Car[]>) => {
-        state.cars = action.payload;
-        state.loading = false;
-      })
+      .addCase(
+        fetchCars.fulfilled,
+        (state, action: PayloadAction<{ cars: Car[]; totalCount: number }>) => {
+          state.cars = action.payload.cars;
+          state.carsCount = action.payload.totalCount;
+          state.loading = false;
+        },
+      )
       .addCase(fetchCars.rejected, (state, action) => {
         state.error = handleApiError(action.payload, 'Failed to fetch the cars. Please try again.');
         state.loading = false;
@@ -210,5 +234,5 @@ const garageSlice = createSlice({
   },
 });
 
-export const { setCars, setError, setSelected } = garageSlice.actions;
+export const { setCars, setError, setSelected, nextPage, prevPage } = garageSlice.actions;
 export default garageSlice.reducer;

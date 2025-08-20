@@ -2,10 +2,14 @@ import type { Car } from '../types/car';
 
 const URL = 'http://localhost:3000/garage';
 
-const getCarsApi = async (): Promise<Car[]> => {
-  const res = await fetch(URL);
+const getCarsApi = async (page: number): Promise<{ cars: Car[]; totalCount: number }> => {
+  const res = await fetch(`${URL}?_page=${page}&_limit=7`);
   if (!res.ok) throw new Error(`Failed to fetch cars: ${res.status}`);
-  return (await res.json()) as Car[];
+
+  const totalCount = Number(res.headers.get('X-Total-Count'));
+  const cars = (await res.json()) as Car[];
+
+  return { cars, totalCount };
 };
 
 const addCarApi = async (carObj: { name: string; color: string }): Promise<Car> => {
