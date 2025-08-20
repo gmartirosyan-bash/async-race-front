@@ -11,7 +11,8 @@ interface CarPanelProps {
 export default function CarPanel({ car }: CarPanelProps) {
   const selected = useAppSelector((state) => state.garage.selected);
 
-  const [moving, setMoving] = useState<boolean>(false);
+  const [disableStart, setDisableStart] = useState<boolean>(false);
+  const [disableStop, setDisableStop] = useState<boolean>(true);
 
   const dispatch = useAppDispatch();
 
@@ -35,7 +36,11 @@ export default function CarPanel({ car }: CarPanelProps) {
     if (selected?.id === car.id) {
       dispatch(setSelected(null));
     }
-    setMoving(true);
+    setDisableStart(true);
+    setDisableStop(true);
+    setTimeout(() => {
+      setDisableStop(false);
+    }, 2000);
   };
 
   const handleStopCar = (id: number) => {
@@ -43,7 +48,11 @@ export default function CarPanel({ car }: CarPanelProps) {
     if (selected?.id === car.id) {
       dispatch(setSelected(null));
     }
-    setMoving(false);
+    setDisableStop(true);
+    setDisableStart(true);
+    setTimeout(() => {
+      setDisableStart(false);
+    }, 2000);
   };
 
   return (
@@ -65,20 +74,19 @@ export default function CarPanel({ car }: CarPanelProps) {
       <div className="flex flex-col gap-3 mr-4">
         <button
           onClick={() => handleDriveCar(car.id)}
-          className={`active:scale-90 transform transition-transform duration-50 
+          className={`active:scale-90 transform transition-transform duration-20 
             px-4 text-sm font-semibold rounded-2xl bg-green-500 text-black 
             border-2 border-gray-600
-            ${moving ? 'pointer-events-none opacity-50' : ''}`}
+            ${disableStart ? 'pointer-events-none opacity-50' : ''}`}
         >
           START
         </button>
         <button
-          disabled={moving ? false : true}
           onClick={() => handleStopCar(car.id)}
-          className={`active:scale-90 transform transition-transform duration-50
+          className={`active:scale-90 transform transition-transform duration-20
             px-4 text-sm font-semibold rounded-2xl bg-red-800 text-white
             border-2 border-gray-700
-            ${moving ? '' : 'pointer-events-none opacity-50'}`}
+            ${disableStop ? 'pointer-events-none opacity-50' : ''}`}
         >
           STOP
         </button>
