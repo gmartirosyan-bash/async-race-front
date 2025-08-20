@@ -21,7 +21,6 @@ export default function CarElement({ car }: CarElementProps) {
 
     if (carState?.broke) {
       const computed = window.getComputedStyle(carRef.current).left;
-      carRef.current.style.transition = 'none';
       carRef.current.style.left = computed;
     }
   }, [movingCars, carState]);
@@ -42,7 +41,6 @@ export default function CarElement({ car }: CarElementProps) {
           <CarSvg className="w-40 h-20" fill={car.color} />
         </div>
       </div>
-      <p className="absolute left-85 -z-40 text-5xl opacity-40">{car.name}</p>
     </>
   );
 }

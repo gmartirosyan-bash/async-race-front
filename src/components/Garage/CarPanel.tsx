@@ -1,6 +1,7 @@
 import { driveCar, removeCar, setSelected, stopCar } from '../../redux/features/garageSlice';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { useState } from 'react';
+import { PencilOff, Pencil, Trash2 } from 'lucide-react';
 import type { Car } from '../../types/car';
 
 interface CarPanelProps {
@@ -16,6 +17,9 @@ export default function CarPanel({ car }: CarPanelProps) {
 
   const handleRemoveCar = (id: number) => {
     dispatch(removeCar(id));
+    if (selected?.id === car.id) {
+      dispatch(setSelected(null));
+    }
   };
 
   const handleSelectCar = (car: Car) => {
@@ -28,42 +32,57 @@ export default function CarPanel({ car }: CarPanelProps) {
 
   const handleDriveCar = (id: number) => {
     dispatch(driveCar(id));
+    if (selected?.id === car.id) {
+      dispatch(setSelected(null));
+    }
     setMoving(true);
   };
 
   const handleStopCar = (id: number) => {
     dispatch(stopCar(id));
+    if (selected?.id === car.id) {
+      dispatch(setSelected(null));
+    }
+    setMoving(false);
   };
 
   return (
-    <div className={`flex items-center gap-4 ${moving ? 'pointer-events-none opacity-50' : ''}`}>
-      <div className="flex flex-col gap-3 max-w-25">
+    <div className={`relative flex items-center gap-4 font-roboto`}>
+      <div className="flex flex-col gap-3 ml-6">
         <button
           onClick={() => handleSelectCar(car)}
-          className="px-3 font-semibold rounded-2xl bg-yellow-400 text-black"
+          className=" font-semibold text-yellow-400 border-1 border-yellow-400 rounded p-1"
         >
-          {selected && selected.id === car.id ? 'UNSET' : 'SELECT'}
+          {selected && selected.id === car.id ? <PencilOff size={15} /> : <Pencil size={15} />}
         </button>
         <button
           onClick={() => handleRemoveCar(car.id)}
-          className="px-3 font-semibold rounded-2xl bg-pink-700 text-black"
+          className=" font-semibold text-red-600 border-1 borde-red-600 rounded p-1"
         >
-          REMOVE
+          <Trash2 size={15} />
         </button>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 mr-4">
         <button
           onClick={() => handleDriveCar(car.id)}
-          className="px-3 font-semibold rounded-2xl bg-green-500 text-black"
+          className={`active:scale-90 transform transition-transform duration-50 
+            px-4 text-sm font-semibold rounded-2xl bg-green-500 text-black 
+            border-2 border-gray-600
+            ${moving ? 'pointer-events-none opacity-50' : ''}`}
         >
           START
         </button>
         <button
+          disabled={moving ? false : true}
           onClick={() => handleStopCar(car.id)}
-          className="px-3 font-semibold rounded-2xl bg-red-700 text-black"
+          className={`active:scale-90 transform transition-transform duration-50
+            px-4 text-sm font-semibold rounded-2xl bg-red-800 text-white
+            border-2 border-gray-700
+            ${moving ? '' : 'pointer-events-none opacity-50'}`}
         >
           STOP
         </button>
+        <p className="absolute left-85 text-5xl -z-10 opacity-40">{car.name}</p>
       </div>
     </div>
   );
