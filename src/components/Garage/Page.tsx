@@ -25,7 +25,7 @@ const Page = () => {
     <div className="flex justify-around gap-200 mt-4 text-red-800 font-semibold">
       <div className="flex">
         <button
-          className={`active:text-red-700 active:scale-90s
+          className={`active:text-red-700 active:scale-90
           ${isRacing ? 'pointer-events-none opacity-50' : ''}`}
           onClick={handlePrevPage}
         >
@@ -35,7 +35,7 @@ const Page = () => {
           PAGE #{page}/{Math.ceil(carsCount / 7)}
         </p>
         <button
-          className={`active:text-red-700 active:scale-90s
+          className={`active:text-red-700 active:scale-90
           ${isRacing ? 'pointer-events-none opacity-50' : ''}`}
           onClick={handleNextPage}
         >

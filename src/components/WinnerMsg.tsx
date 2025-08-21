@@ -6,7 +6,7 @@ export default function WinnerMsg({ winner }: { winner: Winner }) {
       <div className="bg-white/70 text-black font-bold text-5xl px-8 py-4 rounded-lg shadow-lg text-center space-y-6">
         <p className="text-red-700">WINNER!</p>
         <p className="text-black">{winner.name}!</p>
-        <p className="text-black">TIME: {Math.floor(winner.duration / 10)} s</p>
+        <p className="text-black">TIME: {Math.floor(winner.duration / 10) / 100} s</p>
       </div>
     </div>
   );

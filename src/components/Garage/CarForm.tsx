@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { addCar, setSelected, updateCar } from '../../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { Plus } from 'lucide-react';
 
 export default function CarForm() {
   const [name, setName] = useState<string>('');
-  const [color, setColor] = useState<string>('#ff0000');
+  const [color, setColor] = useState<string>('#ffffff');
 
   const selected = useAppSelector((state) => state.garage.selected);
 
@@ -16,7 +15,7 @@ export default function CarForm() {
       setColor(selected.color);
     } else {
       setName('');
-      setColor('#ff0000');
+      setColor('#ffffff');
     }
   }, [selected]);
   const handleAddCar = (e: React.FormEvent) => {
@@ -33,12 +32,12 @@ export default function CarForm() {
 
   return (
     <>
-      <form onSubmit={handleAddCar}>
+      <form onSubmit={handleAddCar} className="flex items-center">
         <label htmlFor="car-name" className="sr-only">
           Car Name
         </label>
         <input
-          className="mr-2 w-35 rounded px-2 py-1"
+          className="px-3 py-2 rounded bg-neutral-800 text-white border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-red-500"
           id="car-name"
           placeholder="Enter car name"
           type="text"
@@ -46,18 +45,24 @@ export default function CarForm() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <label htmlFor="car-color" className="sr-only">
-          Car Color
+        <label className="ml-2 inline-flex items-center space-x-2 cursor-pointer">
+          <span
+            className="w-10 h-10 rounded border-red-800 border-3 active:scale-90"
+            style={{ backgroundColor: color }}
+          />
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="w-0 h-0 overflow-hidden opacity-0"
+          />
         </label>
-        <input
-          className="w-6 h-6 mr-2 rounded cursor-pointer"
-          id="car-color"
-          type="color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-        />
-        <button className="px-2 py-1 rounded-md font-semibold text-xl" type="submit">
-          {selected ? 'UPDATE' : 'CREATE'} <Plus className="inline text-red-600" size={18} />
+
+        <button
+          type="submit"
+          className="font-semibold bg-red-800 px-4 py-2 active:scale-95 rounded hover:bg-red-900 hover:cursor-pointer active:bg-red-800"
+        >
+          {selected ? '✏️ Update The Car' : '+ Create A New Car'}
         </button>
       </form>
     </>

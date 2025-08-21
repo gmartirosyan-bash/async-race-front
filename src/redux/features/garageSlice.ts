@@ -191,7 +191,9 @@ const garageSlice = createSlice({
       state.loading = aciton.payload;
     },
     nextPage: (state) => {
-      if (state.page === Math.ceil(state.carsCount / 7)) {
+      if (state.carsCount === 0) {
+        state.page = 1;
+      } else if (state.page === Math.ceil(state.carsCount / 7)) {
         state.page = 1;
       } else {
         state.page += 1;
@@ -199,7 +201,9 @@ const garageSlice = createSlice({
       state.selected = null;
     },
     prevPage: (state) => {
-      if (state.page === 1) {
+      if (state.carsCount === 0) {
+        state.page = 1;
+      } else if (state.page === 1 || state.carsCount === 0) {
         state.page = Math.ceil(state.carsCount / 7);
       } else {
         state.page -= 1;
@@ -213,6 +217,9 @@ const garageSlice = createSlice({
     },
     removePendingMoving: (state, action: PayloadAction<number>) => {
       state.pendingMoving = state.pendingMoving.filter((id) => id !== action.payload);
+    },
+    clearWinner: (state) => {
+      state.winner = null;
     },
   },
   extraReducers: (builder) => {
@@ -235,7 +242,10 @@ const garageSlice = createSlice({
         state.carsCount++;
       })
       .addCase(removeCar.fulfilled, (state) => {
-        if (state.moving.length === 0 && state.page !== 1) state.page = state.page - 1;
+        if (state.cars.length === 1 && state.page !== 1) {
+          console.log('asdfasd');
+          state.page = state.page - 1;
+        }
         state.carsCount--;
       })
       .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
@@ -283,5 +293,6 @@ export const {
   addPendingMoving,
   removePendingMoving,
   setLoading,
+  clearWinner,
 } = garageSlice.actions;
 export default garageSlice.reducer;

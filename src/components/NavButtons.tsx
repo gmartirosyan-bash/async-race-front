@@ -1,8 +1,7 @@
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
 import { resetCars } from '../redux/features/garageSlice';
-
 import { Link } from 'react-router-dom';
-
+import { Crown, DoorClosed } from 'lucide-react';
 export default function NavButtons() {
   const raceStatus = useAppSelector((status) => status.garage.raceStatus);
 
@@ -17,20 +16,21 @@ export default function NavButtons() {
     <>
       <Link
         to="/garage"
-        className={`inline-block bg-transparent p-4 mr-5 mb-11 text-red-500
-            border-1 ring-3 ring-red-700 border-red-700 outline-2 outline-red-400 rounded-2xl
+        className={`inline-block p-4 mr-5 mb-11 px-6 py-3 bg-blue-500 text-white 
+          font-semibold rounded-lg hover:bg-blue-600 focus:outline-none 
+          focus:ring-2 focus:ring-blue-400 
             ${isRacing ? 'pointer-events-none opacity-50' : ''}`}
       >
-        TO GARAGE
+        TO GARAGE <DoorClosed className="inline" />
       </Link>
       <Link
         to="/winners"
         onClick={handleToWinners}
-        className={`inline-block bg-transparent p-4 text-blue-500
-            border-2 border-blue-400 outline-2 outline-blue-700 rounded-2xl
+        className={`inline-block p-4 mr-5 mb-11 px-6 py-3 text-white bg-yellow-600 hover:bg-yellow-700
+             font-semibold rounded-lg
             ${isRacing ? 'pointer-events-none opacity-50' : ''}`}
       >
-        TO WINNERS
+        TO WINNERS <Crown className="inline" />
       </Link>
     </>
   );

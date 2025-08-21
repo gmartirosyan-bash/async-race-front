@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchCars } from '../redux/features/garageSlice';
+import { clearWinner, fetchCars } from '../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GarageMenu from '../components/Garage/GarageMenu';
 import GarageCars from '../components/Garage/GarageCars';
@@ -7,12 +7,13 @@ import Border from '../components/Garage/Border';
 import Page from '../components/Garage/Page';
 import LoadingIndicator from '../components/LoadingIndicator';
 import WinnerMsg from '../components/WinnerMsg';
+import EmptyGarage from '../components/Garage/EmpyGarage';
 
 export default function Garage() {
   const loading = useAppSelector((state) => state.garage.loading);
   const winner = useAppSelector((state) => state.garage.winner);
   const page = useAppSelector((state) => state.garage.page);
-  const cars = useAppSelector((state) => state.garage.cars);
+  const carsCount = useAppSelector((state) => state.garage.carsCount);
 
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [showWinner, setShowWinner] = useState(false);
@@ -29,12 +30,13 @@ export default function Garage() {
       setShowWinner(true);
       const timer = setTimeout(() => {
         setShowWinner(false);
+        dispatch(clearWinner());
       }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [winner]);
-
+  }, [dispatch, winner]);
+  console.log(carsCount);
   if (loading) return <LoadingIndicator />;
   return (
     <>
@@ -42,7 +44,7 @@ export default function Garage() {
       <div className="overflow-hidden max-w-350 m-auto font-roboto">
         <GarageMenu />
         <Border />
-        {!cars.length && <div className="text-center text-4xl text-red-700">GARAGE IS EMPTY</div>}
+        {carsCount === 0 && <EmptyGarage />}
         <GarageCars />
         <Border />
         <Page />
