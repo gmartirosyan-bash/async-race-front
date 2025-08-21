@@ -38,74 +38,78 @@ const initialState: GarageState = {
 
 export const fetchCars = createAsyncThunk<
   { cars: Car[]; totalCount: number },
-  void,
-  { state: RootState; rejectValue: unknown }
->('garage/fetchCars', async (_, { getState, rejectWithValue }) => {
+  boolean,
+  { state: RootState; dispatch: AppDispatch }
+>('garage/fetchCars', async (firstRender, { getState, dispatch }) => {
   const page = getState().garage.page;
   try {
+    if (firstRender) dispatch(setLoading(true));
     const data = await carsApi.getCarsApi(page);
+    if (firstRender) dispatch(setLoading(false));
     return data;
   } catch (err) {
-    return rejectWithValue(err);
+    console.error('Failed to fetch the cars:', err);
+    throw err;
   }
 });
 
 export const addCar = createAsyncThunk<
   void,
   { name: string; color: string },
-  { dispatch: AppDispatch; rejectValue: unknown }
->('garage/addCar', async (newCar, { dispatch, rejectWithValue }) => {
+  { dispatch: AppDispatch }
+>('garage/addCar', async (newCar, { dispatch }) => {
   try {
     await carsApi.addCarApi(newCar);
-    dispatch(fetchCars());
+    dispatch(fetchCars(false));
   } catch (err) {
-    return rejectWithValue(err);
+    console.error('Failed to add a cars:', err);
+    throw err;
   }
 });
 
-export const removeCar = createAsyncThunk<
-  number,
-  number,
-  { dispatch: AppDispatch; rejectValue: unknown }
->('garage/removeCar', async (id, { dispatch, rejectWithValue }) => {
-  try {
-    dispatch(removePendingMoving(id));
-    await carsApi.removeCarApi(id);
-    dispatch(fetchCars());
+export const removeCar = createAsyncThunk<number, number, { dispatch: AppDispatch }>(
+  'garage/removeCar',
+  async (id, { dispatch }) => {
+    try {
+      dispatch(removePendingMoving(id));
+      await carsApi.removeCarApi(id);
+      dispatch(fetchCars(false));
 
-    return id;
-  } catch (err) {
-    return rejectWithValue(err);
-  }
-});
+      return id;
+    } catch (err) {
+      console.error('Failed to remove the cars:', err);
+      throw err;
+    }
+  },
+);
 
 export const updateCar = createAsyncThunk<
   Car,
-  { id: number; newCar: { name: string; color: string } },
-  { rejectValue: unknown }
->('garage/updateCar', async ({ id, newCar }, { rejectWithValue }) => {
+  { id: number; newCar: { name: string; color: string } }
+>('garage/updateCar', async ({ id, newCar }) => {
   try {
     const data = await carsApi.updateCarApi(id, newCar);
     return data;
   } catch (err) {
-    return rejectWithValue(err);
+    console.error('Failed to update the cars:', err);
+    throw err;
   }
 });
 
-export const startCar = createAsyncThunk<
-  MovingCar,
-  number,
-  { dispatch: AppDispatch; rejectValue: unknown }
->('garage/startCar', async (id, { dispatch, rejectWithValue }) => {
-  try {
-    dispatch(addPendingMoving(id));
-    const data = (await engineApi.raceApi(id, 'started')) as Start;
-    const duration = data.distance / data.velocity;
-    return { id, duration, broke: false };
-  } catch (err) {
-    return rejectWithValue(err);
-  }
-});
+export const startCar = createAsyncThunk<MovingCar, number, { dispatch: AppDispatch }>(
+  'garage/startCar',
+  async (id, { dispatch }) => {
+    try {
+      dispatch(addPendingMoving(id));
+      const data = (await engineApi.raceApi(id, 'started')) as Start;
+      const duration = data.distance / data.velocity;
+      return { id, duration, broke: false };
+    } catch (err) {
+      console.error('Failed to start the cars:', err);
+      throw err;
+    }
+  },
+);
 
 export const driveCar = createAsyncThunk<
   Start,
@@ -121,7 +125,7 @@ export const driveCar = createAsyncThunk<
     if (typeof err === 'number' && err === 500) {
       return rejectWithValue(id);
     }
-
+    console.error('Failed to remove the cars:', err);
     throw err;
   }
 });
@@ -133,8 +137,9 @@ export const stopCar = createAsyncThunk<number, number>(
       dispatch(removePendingMoving(id));
       await engineApi.raceApi(id, 'stopped');
       return id;
-    } catch {
-      throw new Error('Failed to stop the car');
+    } catch (err) {
+      console.error('Failed to stop the car:', err);
+      throw err;
     }
   },
 );
@@ -153,8 +158,9 @@ export const raceCars = createAsyncThunk<number, void, { state: RootState; dispa
     try {
       const winnerId = await Promise.any(drivePromises);
       return winnerId;
-    } catch {
-      throw new Error('All cars failed');
+    } catch (err) {
+      console.error('Failed to stop the car:', err);
+      throw err;
     }
   },
 );
@@ -168,6 +174,9 @@ const garageSlice = createSlice({
     },
     setSelected(state, action: PayloadAction<Car | null>) {
       state.selected = action.payload;
+    },
+    setLoading(state, aciton: PayloadAction<boolean>) {
+      state.loading = aciton.payload;
     },
     nextPage: (state) => {
       if (state.page === Math.floor(state.carsCount / 7) + 1) {
@@ -242,6 +251,13 @@ const garageSlice = createSlice({
   },
 });
 
-export const { setCars, setSelected, nextPage, prevPage, addPendingMoving, removePendingMoving } =
-  garageSlice.actions;
+export const {
+  setCars,
+  setSelected,
+  nextPage,
+  prevPage,
+  addPendingMoving,
+  removePendingMoving,
+  setLoading,
+} = garageSlice.actions;
 export default garageSlice.reducer;

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchCars } from '../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GarageMenu from '../components/Garage/GarageMenu';
@@ -11,10 +11,14 @@ export default function Garage() {
   const loading = useAppSelector((state) => state.garage.loading);
   const winner = useAppSelector((state) => state.garage.winner);
   const page = useAppSelector((state) => state.garage.page);
+
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchCars());
+    dispatch(fetchCars(initialLoad));
+    setInitialLoad(false);
   }, [dispatch, page]);
 
   if (loading) return <LoadingIndicator />;
