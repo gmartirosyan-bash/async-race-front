@@ -12,9 +12,9 @@ export default function CarElement({ car }: CarElementProps) {
   const carRef = useRef<HTMLDivElement>(null);
 
   const CarSvg = carSvgs[car.id % 9];
-  const isMoving = movingCars.some((moving) => moving.id === car.id);
-  const speed = movingCars.find((moving) => moving.id === car.id)?.duration;
-  const carState = movingCars.find((m) => m.id === car.id);
+  const isMoving = movingCars.some((mc) => mc.id === car.id);
+  const speed = movingCars.find((mc) => mc.id === car.id)?.duration;
+  const carState = movingCars.find((mc) => mc.id === car.id);
 
   useEffect(() => {
     if (!carRef.current) return;

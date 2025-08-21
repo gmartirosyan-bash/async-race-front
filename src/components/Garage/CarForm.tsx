@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { addCar, setSelected, updateCar } from '../../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { Plus } from 'lucide-react';
 
 export default function CarForm() {
   const [name, setName] = useState<string>('');
@@ -56,7 +57,7 @@ export default function CarForm() {
           onChange={(e) => setColor(e.target.value)}
         />
         <button className="px-2 py-1 rounded-md font-semibold text-xl" type="submit">
-          {selected ? 'UPDATE' : 'CREATE'}
+          {selected ? 'UPDATE' : 'CREATE'} <Plus className="inline text-red-600" size={18} />
         </button>
       </form>
     </>

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import handleApiError from '../../utils/handleApiError';
 import carsApi from '../../api/cars';
 import engineApi from '../../api/race';
 import type { Car, Start } from '../../types/car';
@@ -11,26 +10,30 @@ interface MovingCar {
   broke: boolean;
 }
 
+export type RaceStatus = 'idle' | 'racing' | 'finished';
+
 interface GarageState {
   cars: Car[];
-  error: string | null;
   loading: boolean;
   selected: Car | null;
   moving: MovingCar[];
+  pendingMoving: number[];
   winner: number | null;
   page: number;
   carsCount: number;
+  raceStatus: RaceStatus;
 }
 
 const initialState: GarageState = {
   cars: [],
-  error: null,
   loading: false,
   selected: null,
   moving: [],
+  pendingMoving: [],
   winner: null,
   page: 1,
   carsCount: 0,
+  raceStatus: 'idle',
 };
 
 export const fetchCars = createAsyncThunk<
@@ -48,29 +51,33 @@ export const fetchCars = createAsyncThunk<
 });
 
 export const addCar = createAsyncThunk<
-  Car,
+  void,
   { name: string; color: string },
-  { rejectValue: unknown }
->('garage/addCar', async (newCar, { rejectWithValue }) => {
+  { dispatch: AppDispatch; rejectValue: unknown }
+>('garage/addCar', async (newCar, { dispatch, rejectWithValue }) => {
   try {
-    const data = await carsApi.addCarApi(newCar);
-    return data;
+    await carsApi.addCarApi(newCar);
+    dispatch(fetchCars());
   } catch (err) {
     return rejectWithValue(err);
   }
 });
 
-export const removeCar = createAsyncThunk<number, number, { rejectValue: unknown }>(
-  'garage/removeCar',
-  async (id, { rejectWithValue }) => {
-    try {
-      await carsApi.removeCarApi(id);
-      return id;
-    } catch (err) {
-      return rejectWithValue(err);
-    }
-  },
-);
+export const removeCar = createAsyncThunk<
+  number,
+  number,
+  { dispatch: AppDispatch; rejectValue: unknown }
+>('garage/removeCar', async (id, { dispatch, rejectWithValue }) => {
+  try {
+    dispatch(removePendingMoving(id));
+    await carsApi.removeCarApi(id);
+    dispatch(fetchCars());
+
+    return id;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
+});
 
 export const updateCar = createAsyncThunk<
   Car,
@@ -85,45 +92,52 @@ export const updateCar = createAsyncThunk<
   }
 });
 
-export const startCar = createAsyncThunk<MovingCar, number, { rejectValue: unknown }>(
-  'garage/startCar',
-  async (id, { rejectWithValue }) => {
-    try {
-      const data = (await engineApi.raceApi(id, 'started')) as Start;
-      const duration = data.distance / data.velocity;
-      return { id, duration, broke: false };
-    } catch (err) {
-      return rejectWithValue(err);
-    }
-  },
-);
-
-export const driveCar = createAsyncThunk<Start, number, { rejectValue: number }>(
-  'garage/driveCar',
-  async (id, { dispatch, rejectWithValue }) => {
-    try {
-      await dispatch(startCar(id)).unwrap();
-
-      const data = await engineApi.raceApi(id, 'drive');
-      return data as Start;
-    } catch (err: unknown) {
-      if (typeof err === 'number' && err === 500) {
-        return rejectWithValue(id);
-      }
-
-      throw err;
-    }
-  },
-);
-
-export const stopCar = createAsyncThunk<number | void, number>('garage/stopCar', async (id) => {
+export const startCar = createAsyncThunk<
+  MovingCar,
+  number,
+  { dispatch: AppDispatch; rejectValue: unknown }
+>('garage/startCar', async (id, { dispatch, rejectWithValue }) => {
   try {
-    await engineApi.raceApi(id, 'stopped');
-    return id;
+    dispatch(addPendingMoving(id));
+    const data = (await engineApi.raceApi(id, 'started')) as Start;
+    const duration = data.distance / data.velocity;
+    return { id, duration, broke: false };
   } catch (err) {
-    console.error('Failed to stop the car', err);
+    return rejectWithValue(err);
   }
 });
+
+export const driveCar = createAsyncThunk<
+  Start,
+  number,
+  { dispatch: AppDispatch; rejectValue: number }
+>('garage/driveCar', async (id, { dispatch, rejectWithValue }) => {
+  try {
+    await dispatch(startCar(id)).unwrap();
+
+    const data = await engineApi.raceApi(id, 'drive');
+    return data as Start;
+  } catch (err: unknown) {
+    if (typeof err === 'number' && err === 500) {
+      return rejectWithValue(id);
+    }
+
+    throw err;
+  }
+});
+
+export const stopCar = createAsyncThunk<number, number>(
+  'garage/stopCar',
+  async (id, { dispatch }) => {
+    try {
+      dispatch(removePendingMoving(id));
+      await engineApi.raceApi(id, 'stopped');
+      return id;
+    } catch {
+      throw new Error('Failed to stop the car');
+    }
+  },
+);
 
 export const raceCars = createAsyncThunk<number, void, { state: RootState; dispatch: AppDispatch }>(
   'garage/raceCars',
@@ -152,14 +166,11 @@ const garageSlice = createSlice({
     setCars(state, action: PayloadAction<Car[]>) {
       state.cars = action.payload;
     },
-    setError(state, action: PayloadAction<string | null>) {
-      state.error = action.payload;
-    },
     setSelected(state, action: PayloadAction<Car | null>) {
       state.selected = action.payload;
     },
     nextPage: (state) => {
-      if (state.page === Math.ceil(state.carsCount / 7)) {
+      if (state.page === Math.floor(state.carsCount / 7) + 1) {
         state.page = 1;
       } else {
         state.page += 1;
@@ -167,17 +178,24 @@ const garageSlice = createSlice({
     },
     prevPage: (state) => {
       if (state.page === 1) {
-        state.page = Math.ceil(state.carsCount / 7);
+        state.page = Math.floor(state.carsCount / 7) + 1;
       } else {
         state.page -= 1;
       }
+    },
+    addPendingMoving: (state, action: PayloadAction<number>) => {
+      if (!state.pendingMoving.includes(action.payload)) {
+        state.pendingMoving.push(action.payload);
+      }
+    },
+    removePendingMoving: (state, action: PayloadAction<number>) => {
+      state.pendingMoving = state.pendingMoving.filter((id) => id !== action.payload);
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCars.pending, (state) => {
         state.loading = false; //don't really need
-        state.error = null;
       })
       .addCase(
         fetchCars.fulfilled,
@@ -187,52 +205,43 @@ const garageSlice = createSlice({
           state.loading = false;
         },
       )
-      .addCase(fetchCars.rejected, (state, action) => {
-        state.error = handleApiError(action.payload, 'Failed to fetch the cars. Please try again.');
+      .addCase(fetchCars.rejected, (state) => {
         state.loading = false;
       })
-      .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
-        state.cars.push(action.payload);
-      })
-      .addCase(addCar.rejected, (state, action) => {
-        state.error = handleApiError(action.payload, 'Failed to add a car. Please try again.');
+      .addCase(addCar.fulfilled, (state) => {
+        state.carsCount++;
       })
       .addCase(removeCar.fulfilled, (state, action: PayloadAction<number>) => {
-        state.cars = state.cars.filter((car) => car.id !== action.payload);
         state.moving = state.moving.filter((car) => car.id !== action.payload);
-      })
-      .addCase(removeCar.rejected, (state, action) => {
-        state.error = handleApiError(action.payload, 'Failed to remove the car. Please try again.');
+        state.carsCount--;
       })
       .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
         state.cars = state.cars.map((car) => (car.id === action.payload.id ? action.payload : car));
       })
-      .addCase(updateCar.rejected, (state, action) => {
-        state.error = handleApiError(action.payload, 'Failed to update the car. Please try again.');
-      })
       .addCase(startCar.fulfilled, (state, action: PayloadAction<MovingCar>) => {
         state.moving.push(action.payload);
       })
-      .addCase(startCar.rejected, (state, action) => {
-        state.error = handleApiError(action.payload, 'Failed to start the car. Please try again.');
-      })
-      .addCase(stopCar.fulfilled, (state, action) => {
-        if (action) state.moving = state.moving.filter((car) => car.id !== action.payload);
+      .addCase(stopCar.fulfilled, (state, action: PayloadAction<number>) => {
+        state.moving = state.moving.filter((car) => car.id !== action.payload);
       })
       .addCase(driveCar.rejected, (state, action) => {
         state.moving = state.moving.map((car) =>
           car.id === action.payload ? { ...car, broke: true } : car,
         );
       })
+      .addCase(raceCars.pending, (state) => {
+        state.raceStatus = 'racing';
+      })
       .addCase(raceCars.fulfilled, (state, action) => {
         state.winner = action.payload;
+        state.raceStatus = 'finished';
+      })
+      .addCase(raceCars.rejected, (state) => {
+        state.raceStatus = 'finished';
       });
-
-    // .addCase(driveCar.fulfilled, (state, action: PayloadAction<Start | void>) => {
-    //   if (action.payload) state.time = action.payload.distance / action.payload.velocity;
-    // });
   },
 });
 
-export const { setCars, setError, setSelected, nextPage, prevPage } = garageSlice.actions;
+export const { setCars, setSelected, nextPage, prevPage, addPendingMoving, removePendingMoving } =
+  garageSlice.actions;
 export default garageSlice.reducer;

@@ -23,7 +23,7 @@ export default function Garage() {
   if (error) return <CustomMsg />;
   return (
     <>
-      <div className="overflow-hidden max-w-350 m-auto">
+      <div className="overflow-hidden max-w-350 m-auto font-roboto">
         <GarageMenu />
         <Border />
         {winner && <div>winner is {winner}</div>}

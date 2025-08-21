@@ -4,7 +4,7 @@ import NavButtons from '../NavButtons';
 
 export default function GarageMenu() {
   return (
-    <div className="mt-10 bg-[url('/Async-race.png')]  bg-center bg-no-repeat bg-contain h-70">
+    <div className="mt-10  mb-20">
       <div className="ml-10">
         <NavButtons />
         <CarForm />

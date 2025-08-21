@@ -17,13 +17,13 @@ const Page = () => {
   };
 
   return (
-    <div className="flex justify-around gap-200 mt-4 font-roboto text-red-800 font-semibold">
+    <div className="flex justify-around gap-200 mt-4 text-red-800 font-semibold">
       <div className="flex">
         <button className="active:text-red-700 active:scale-90" onClick={handlePrevPage}>
           <SquareChevronLeft strokeWidth={3} size={25} />
         </button>
         <p className="text-3xl mx-1 text-neutral-300">
-          PAGE #{page}/{Math.ceil(carsCount / 7)}
+          PAGE #{page}/{Math.floor(carsCount / 7) + 1}
         </p>
         <button className="active:text-red-700 active:scale-90" onClick={handleNextPage}>
           <SquareChevronRight strokeWidth={3} size={25} />

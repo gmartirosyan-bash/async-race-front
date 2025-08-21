@@ -10,11 +10,16 @@ interface CarPanelProps {
 
 export default function CarPanel({ car }: CarPanelProps) {
   const selected = useAppSelector((state) => state.garage.selected);
-
-  const [disableStart, setDisableStart] = useState<boolean>(false);
-  const [disableStop, setDisableStop] = useState<boolean>(true);
+  const raceStatus = useAppSelector((s) => s.garage.raceStatus);
+  const movingCars = useAppSelector((s) => s.garage.pendingMoving);
 
   const dispatch = useAppDispatch();
+
+  const isRacing = raceStatus === 'racing';
+  const isMoving = movingCars.some((id) => id === car.id);
+
+  const startEnabled = !isRacing && !isMoving;
+  const stopEnabled = !isRacing && isMoving;
 
   const handleRemoveCar = (id: number) => {
     dispatch(removeCar(id));
@@ -36,11 +41,6 @@ export default function CarPanel({ car }: CarPanelProps) {
     if (selected?.id === car.id) {
       dispatch(setSelected(null));
     }
-    setDisableStart(true);
-    setDisableStop(true);
-    setTimeout(() => {
-      setDisableStop(false);
-    }, 2000);
   };
 
   const handleStopCar = (id: number) => {
@@ -48,15 +48,10 @@ export default function CarPanel({ car }: CarPanelProps) {
     if (selected?.id === car.id) {
       dispatch(setSelected(null));
     }
-    setDisableStop(true);
-    setDisableStart(true);
-    setTimeout(() => {
-      setDisableStart(false);
-    }, 2000);
   };
 
   return (
-    <div className={`relative flex items-center gap-4 font-roboto`}>
+    <div className={`relative flex items-center gap-4`}>
       <div className="flex flex-col gap-3 ml-6">
         <button
           onClick={() => handleSelectCar(car)}
@@ -77,7 +72,7 @@ export default function CarPanel({ car }: CarPanelProps) {
           className={`active:scale-90 transform transition-transform duration-20 
             px-4 text-sm font-semibold rounded-2xl bg-green-400 text-black 
             border-2 border-gray-600
-            ${disableStart ? 'pointer-events-none opacity-50' : ''}`}
+            ${!startEnabled ? 'pointer-events-none opacity-50' : ''}`}
         >
           START
         </button>
@@ -86,7 +81,7 @@ export default function CarPanel({ car }: CarPanelProps) {
           className={`active:scale-90 transform transition-transform duration-20
             px-4 text-sm font-semibold rounded-2xl bg-red-800 text-white
             border-2 border-gray-700
-            ${disableStop ? 'pointer-events-none opacity-50' : ''}`}
+            ${!stopEnabled ? 'pointer-events-none opacity-50' : ''}`}
         >
           STOP
         </button>
