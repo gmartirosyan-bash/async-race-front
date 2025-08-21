@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import carsApi from '../../api/cars';
 import engineApi from '../../api/race';
-import type { Car, Start } from '../../types/car';
+import type { Car, Start, Winner } from '../../types/car';
 import type { RootState, AppDispatch } from '../store';
 
 interface MovingCar {
@@ -18,7 +18,7 @@ interface GarageState {
   selected: Car | null;
   moving: MovingCar[];
   pendingMoving: number[];
-  winner: number | null;
+  winner: Winner | null;
   page: number;
   carsCount: number;
   raceStatus: RaceStatus;
@@ -165,6 +165,18 @@ export const raceCars = createAsyncThunk<number, void, { state: RootState; dispa
   },
 );
 
+export const resetCars = createAsyncThunk<void, void, { state: RootState; dispatch: AppDispatch }>(
+  'garage/resetCars',
+  async (_, { dispatch }) => {
+    try {
+      dispatch(fetchCars(false)); //why????
+    } catch (err) {
+      console.error('Failed to stop the car:', err);
+      throw err;
+    }
+  },
+);
+
 const garageSlice = createSlice({
   name: 'garage',
   initialState,
@@ -179,18 +191,20 @@ const garageSlice = createSlice({
       state.loading = aciton.payload;
     },
     nextPage: (state) => {
-      if (state.page === Math.floor(state.carsCount / 7) + 1) {
+      if (state.page === Math.ceil(state.carsCount / 7)) {
         state.page = 1;
       } else {
         state.page += 1;
       }
+      state.selected = null;
     },
     prevPage: (state) => {
       if (state.page === 1) {
-        state.page = Math.floor(state.carsCount / 7) + 1;
+        state.page = Math.ceil(state.carsCount / 7);
       } else {
         state.page -= 1;
       }
+      state.selected = null;
     },
     addPendingMoving: (state, action: PayloadAction<number>) => {
       if (!state.pendingMoving.includes(action.payload)) {
@@ -220,8 +234,8 @@ const garageSlice = createSlice({
       .addCase(addCar.fulfilled, (state) => {
         state.carsCount++;
       })
-      .addCase(removeCar.fulfilled, (state, action: PayloadAction<number>) => {
-        state.moving = state.moving.filter((car) => car.id !== action.payload);
+      .addCase(removeCar.fulfilled, (state) => {
+        if (state.moving.length === 0 && state.page !== 1) state.page = state.page - 1;
         state.carsCount--;
       })
       .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
@@ -240,13 +254,23 @@ const garageSlice = createSlice({
       })
       .addCase(raceCars.pending, (state) => {
         state.raceStatus = 'racing';
+        state.selected = null;
       })
       .addCase(raceCars.fulfilled, (state, action) => {
-        state.winner = action.payload;
+        const id = action.payload;
+        const duration = state.moving.find((m) => m.id === id)?.duration;
+        const name = state.cars.find((car) => car.id === id)?.name;
+        if (name && duration) state.winner = { id, name, duration };
         state.raceStatus = 'finished';
       })
       .addCase(raceCars.rejected, (state) => {
         state.raceStatus = 'finished';
+      })
+      .addCase(resetCars.fulfilled, (state) => {
+        state.moving = [];
+        state.pendingMoving = [];
+        state.selected = null;
+        state.raceStatus = 'idle';
       });
   },
 });

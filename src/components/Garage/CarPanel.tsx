@@ -54,13 +54,15 @@ export default function CarPanel({ car }: CarPanelProps) {
       <div className="flex flex-col gap-3 ml-6">
         <button
           onClick={() => handleSelectCar(car)}
-          className=" font-semibold text-yellow-400 border-1 border-yellow-400 rounded p-1"
+          className={`font-semibold text-yellow-400 border-1 border-yellow-400 rounded p-1
+          ${isRacing ? 'pointer-events-none opacity-50' : ''}`}
         >
           {selected && selected.id === car.id ? <PencilOff size={15} /> : <Pencil size={15} />}
         </button>
         <button
           onClick={() => handleRemoveCar(car.id)}
-          className=" font-semibold text-red-600 border-1 borde-red-600 rounded p-1"
+          className={`font-semibold text-red-600 border-1 borde-red-600 rounded p-1
+          ${isRacing ? 'pointer-events-none opacity-50' : ''}`}
         >
           <Trash2 size={15} />
         </button>

@@ -8,3 +8,9 @@ export interface Start {
   velocity: number;
   distance: number;
 }
+
+export interface Winner {
+  id: number;
+  name: string;
+  duration: number;
+}
