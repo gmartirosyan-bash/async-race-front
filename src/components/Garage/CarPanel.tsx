@@ -1,6 +1,5 @@
 import { driveCar, removeCar, setSelected, stopCar } from '../../redux/features/garageSlice';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
-import { useState } from 'react';
 import { PencilOff, Pencil, Trash2 } from 'lucide-react';
 import type { Car } from '../../types/car';
 
