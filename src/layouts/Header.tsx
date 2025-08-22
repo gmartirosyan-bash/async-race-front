@@ -17,16 +17,16 @@ export default function Header() {
   const isRacing = raceStatus === 'racing';
 
   return (
-    <div>
-      <header className="flex justify-around gap-100 items-center bg-red-800/20 m-auto">
+    <header className="bg-red-800/40 shadow-lg shadow-red-500">
+      <div className="m-auto max-w-350 flex items-center justify-around">
         <img src="/logo4.png" alt="" className="w-40" />
 
         <div>
           <Link
             to="/garage"
             className={`p-4 px-6 mr-4 bg-blue-500 text-white 
-            font-semibold rounded-lg hover:bg-blue-600 
-            ${isRacing || isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
+              font-semibold rounded-lg hover:bg-blue-600 
+              ${isRacing || isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
           >
             TO GARAGE <DoorClosed className="inline" />
           </Link>
@@ -34,14 +34,14 @@ export default function Header() {
             to="/winners"
             onClick={handleToWinners}
             className={`p-4 px-6 text-white bg-yellow-600 
-            hover:bg-yellow-700
-            font-semibold rounded-lg
-          $ {isRacing || !isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
+              hover:bg-yellow-700
+              font-semibold rounded-lg
+              ${isRacing || !isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
           >
             TO WINNERS <Crown className="inline" />
           </Link>
         </div>
-      </header>
-    </div>
+      </div>
+    </header>
   );
 }
