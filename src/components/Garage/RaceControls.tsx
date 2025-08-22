@@ -36,7 +36,7 @@ export default function RaceControls() {
       <button
         onClick={handleReset}
         className={`px-2 mr-6 rounded-md border-2 text-lg border-red-500 
-          ${!finishedRacing ? 'pointer-events-none opacity-50' : ''}`}
+          ${!finishedRacing && !carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
       >
         RESET <Undo className="inline text-red-600" size={18} />
       </button>

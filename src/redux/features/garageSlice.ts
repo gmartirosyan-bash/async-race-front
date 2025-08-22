@@ -164,18 +164,6 @@ export const raceCars = createAsyncThunk<number, void, { state: RootState; dispa
   },
 );
 
-export const resetCars = createAsyncThunk<void, void, { state: RootState; dispatch: AppDispatch }>(
-  'garage/resetCars',
-  async (_, { dispatch }) => {
-    try {
-      dispatch(fetchCars(false)); //why????
-    } catch (err) {
-      console.error('Failed to stop the car:', err);
-      throw err;
-    }
-  },
-);
-
 const garageSlice = createSlice({
   name: 'garage',
   initialState,
@@ -189,7 +177,13 @@ const garageSlice = createSlice({
     setLoading(state, aciton: PayloadAction<boolean>) {
       state.loading = aciton.payload;
     },
-    nextPage: (state) => {
+    resetCars(state) {
+      state.moving = [];
+      state.pendingMoving = [];
+      state.selected = null;
+      state.raceStatus = 'idle';
+    },
+    nextPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
       } else if (state.page === Math.ceil(state.carsCount / 7)) {
@@ -197,9 +191,8 @@ const garageSlice = createSlice({
       } else {
         state.page += 1;
       }
-      state.selected = null;
     },
-    prevPage: (state) => {
+    prevPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
       } else if (state.page === 1 || state.carsCount === 0) {
@@ -207,7 +200,6 @@ const garageSlice = createSlice({
       } else {
         state.page -= 1;
       }
-      state.selected = null;
     },
     addPendingMoving: (state, action: PayloadAction<number>) => {
       if (!state.pendingMoving.includes(action.payload)) {
@@ -223,20 +215,13 @@ const garageSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCars.pending, (state) => {
-        state.loading = false; //don't really need
-      })
       .addCase(
         fetchCars.fulfilled,
         (state, action: PayloadAction<{ cars: Car[]; totalCount: number }>) => {
           state.cars = action.payload.cars;
           state.carsCount = action.payload.totalCount;
-          state.loading = false;
         },
       )
-      .addCase(fetchCars.rejected, (state) => {
-        state.loading = false;
-      })
       .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
         if (state.cars.length < 7) state.cars.push(action.payload);
         state.carsCount++;
@@ -249,7 +234,8 @@ const garageSlice = createSlice({
         state.cars = state.cars.map((car) => (car.id === action.payload.id ? action.payload : car));
       })
       .addCase(startCar.fulfilled, (state, action: PayloadAction<MovingCar>) => {
-        state.moving.push(action.payload);
+        if (state.pendingMoving.some((pm) => pm === action.payload.id))
+          state.moving.push(action.payload);
       })
       .addCase(stopCar.fulfilled, (state, action: PayloadAction<number>) => {
         state.moving = state.moving.filter((car) => car.id !== action.payload);
@@ -272,12 +258,6 @@ const garageSlice = createSlice({
       })
       .addCase(raceCars.rejected, (state) => {
         state.raceStatus = 'finished';
-      })
-      .addCase(resetCars.fulfilled, (state) => {
-        state.moving = [];
-        state.pendingMoving = [];
-        state.selected = null;
-        state.raceStatus = 'idle';
       });
   },
 });
@@ -291,5 +271,6 @@ export const {
   removePendingMoving,
   setLoading,
   clearWinner,
+  resetCars,
 } = garageSlice.actions;
 export default garageSlice.reducer;

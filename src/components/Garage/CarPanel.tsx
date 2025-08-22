@@ -50,7 +50,7 @@ export default function CarPanel({ car }: CarPanelProps) {
   };
 
   return (
-    <div className={`relative flex items-center gap-4`}>
+    <div className={`relative flex items-center gap-4 my-5`}>
       <div className="flex flex-col gap-3 ml-6">
         <button
           onClick={() => handleSelectCar(car)}
