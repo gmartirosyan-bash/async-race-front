@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { addCar, setSelected, updateCar } from '../../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import createRandomCars from '../../utils/carGenerator';
 
 export default function CarForm() {
   const [name, setName] = useState<string>('');
@@ -20,8 +21,10 @@ export default function CarForm() {
   }, [selected]);
   const handleAddCar = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !color.trim()) return;
-    if (selected) {
+    if (!name.trim() || !color.trim()) {
+      const car = createRandomCars(1)[0];
+      dispatch(addCar(car));
+    } else if (selected) {
       dispatch(updateCar({ id: selected.id, newCar: { name, color } }));
       dispatch(setSelected(null));
     } else {

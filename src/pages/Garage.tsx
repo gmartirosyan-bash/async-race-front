@@ -23,6 +23,7 @@ export default function Garage() {
   useEffect(() => {
     dispatch(fetchCars(initialLoad));
     setInitialLoad(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, page]);
 
   useEffect(() => {
