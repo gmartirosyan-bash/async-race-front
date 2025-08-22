@@ -1,6 +1,7 @@
-import { raceCars, resetCars } from '../../redux/features/garageSlice';
+import { addCar, raceCars, resetCars } from '../../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { Play, Undo } from 'lucide-react';
+import createRandomCars from '../../utils/carGenerator';
 
 export default function RaceControls() {
   const movingCars = useAppSelector((status) => status.garage.pendingMoving);
@@ -16,6 +17,11 @@ export default function RaceControls() {
 
   const handleReset = () => {
     dispatch(resetCars());
+  };
+
+  const handleGenerate = () => {
+    const newCars = createRandomCars();
+    newCars.forEach((car) => dispatch(addCar(car)));
   };
 
   return (
@@ -34,7 +40,10 @@ export default function RaceControls() {
       >
         RESET <Undo className="inline text-red-600" size={18} />
       </button>
-      <button className="px-2 mr-6 rounded-md border-2 text-lg border-red-500">
+      <button
+        onClick={handleGenerate}
+        className="px-2 mr-6 rounded-md border-2 text-lg border-red-500"
+      >
         GENERATE CARS
       </button>
     </div>

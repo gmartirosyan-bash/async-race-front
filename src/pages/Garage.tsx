@@ -36,7 +36,6 @@ export default function Garage() {
       return () => clearTimeout(timer);
     }
   }, [dispatch, winner]);
-  console.log(carsCount);
   if (loading) return <LoadingIndicator />;
   return (
     <>

@@ -53,19 +53,18 @@ export const fetchCars = createAsyncThunk<
   }
 });
 
-export const addCar = createAsyncThunk<
-  void,
-  { name: string; color: string },
-  { dispatch: AppDispatch }
->('garage/addCar', async (newCar, { dispatch }) => {
-  try {
-    await carsApi.addCarApi(newCar);
-    dispatch(fetchCars(false));
-  } catch (err) {
-    console.error('Failed to add a cars:', err);
-    throw err;
-  }
-});
+export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
+  'garage/addCar',
+  async (newCar) => {
+    try {
+      const data = await carsApi.addCarApi(newCar);
+      return data;
+    } catch (err) {
+      console.error('Failed to add a cars:', err);
+      throw err;
+    }
+  },
+);
 
 export const removeCar = createAsyncThunk<number, number, { dispatch: AppDispatch }>(
   'garage/removeCar',
@@ -238,14 +237,12 @@ const garageSlice = createSlice({
       .addCase(fetchCars.rejected, (state) => {
         state.loading = false;
       })
-      .addCase(addCar.fulfilled, (state) => {
+      .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
+        if (state.cars.length < 7) state.cars.push(action.payload);
         state.carsCount++;
       })
       .addCase(removeCar.fulfilled, (state) => {
-        if (state.cars.length === 1 && state.page !== 1) {
-          console.log('asdfasd');
-          state.page = state.page - 1;
-        }
+        if (state.cars.length === 1 && state.page !== 1) state.page = state.page - 1;
         state.carsCount--;
       })
       .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
