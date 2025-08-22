@@ -17,24 +17,27 @@ export default function NavButtons() {
 
   const isRacing = raceStatus === 'racing';
   return (
-    <>
-      <Link
-        to="/garage"
-        className={`inline-block p-4 mr-5 mb-11 px-6 py-3 bg-blue-500 text-white 
+    <div className="flex justify-between items-center">
+      <div>
+        <Link
+          to="/garage"
+          className={`inline-block p-4 mr-5 mb-11 px-6 py-3 bg-blue-500 text-white 
           font-semibold rounded-lg hover:bg-blue-600 
-            ${isRacing || isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
-      >
-        TO GARAGE <DoorClosed className="inline" />
-      </Link>
-      <Link
-        to="/winners"
-        onClick={handleToWinners}
-        className={`inline-block p-4 mb-11 px-6 py-3 text-white bg-yellow-600 hover:bg-yellow-700
-             font-semibold rounded-lg
-            ${isRacing || !isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
-      >
-        TO WINNERS <Crown className="inline" />
-      </Link>
-    </>
+          ${isRacing || isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
+        >
+          TO GARAGE <DoorClosed className="inline" />
+        </Link>
+        <Link
+          to="/winners"
+          onClick={handleToWinners}
+          className={`inline-block p-4 mb-11 px-6 py-3 text-white bg-yellow-600 hover:bg-yellow-700
+          font-semibold rounded-lg
+          ${isRacing || !isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
+        >
+          TO WINNERS <Crown className="inline" />
+        </Link>
+      </div>
+      <img src="/Logo.png" alt="" className="w-30 scale-250 mr-50" />
+    </div>
   );
 }
