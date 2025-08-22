@@ -5,7 +5,7 @@ export default function GarageCars() {
   const cars = useAppSelector((state) => state.garage.cars);
 
   return (
-    <div>
+    <div className="">
       {cars.map((car) => {
         return <GarageCar key={car.id} car={car} />;
       })}

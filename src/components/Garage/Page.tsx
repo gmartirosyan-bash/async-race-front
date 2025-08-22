@@ -22,7 +22,7 @@ const Page = () => {
   };
 
   return (
-    <div className="flex justify-around gap-200 mt-4 text-red-800 font-semibold">
+    <div className="flex justify-around gap-200 mt-8 mb-12 text-red-800 font-semibold">
       <div className="flex">
         <button
           className={`active:text-red-700 active:scale-90

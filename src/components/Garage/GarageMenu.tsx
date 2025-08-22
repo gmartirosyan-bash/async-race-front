@@ -4,8 +4,8 @@ import NavButtons from '../NavButtons';
 
 export default function GarageMenu() {
   return (
-    <div className="mt-10  mb-20">
-      <div className="ml-10">
+    <div className="mt-10 mb-20">
+      <div>
         <NavButtons />
         <CarForm />
         <RaceControls />

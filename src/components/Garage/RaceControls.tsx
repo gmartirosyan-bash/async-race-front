@@ -25,25 +25,22 @@ export default function RaceControls() {
   };
 
   return (
-    <div className={`mt-10 flex`}>
+    <div className={`mt-10 flex gap-11`}>
       <button
         onClick={handleRace}
-        className={`px-2 mr-6 rounded-md border-2 text-lg border-red-500
+        className={`px-2 rounded-md border-2 text-lg border-red-500
       ${carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
       >
         RACE <Play className="inline text-red-600" size={18} />
       </button>
       <button
         onClick={handleReset}
-        className={`px-2 mr-6 rounded-md border-2 text-lg border-red-500 
-          ${!finishedRacing && !carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
+        className={`px-2 rounded-md border-2 text-lg border-red-500 
+          ${!finishedRacing || !carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
       >
         RESET <Undo className="inline text-red-600" size={18} />
       </button>
-      <button
-        onClick={handleGenerate}
-        className="px-2 mr-6 rounded-md border-2 text-lg border-red-500"
-      >
+      <button onClick={handleGenerate} className="px-2 rounded-md border-2 text-lg border-red-500">
         GENERATE CARS
       </button>
     </div>

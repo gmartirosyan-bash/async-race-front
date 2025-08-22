@@ -6,8 +6,9 @@
 
 body {
   color: rgba(255, 255, 255, 0.87);
-  background-image: url('./assets/asphalt.png');
-  background-color: rgb(0, 0, 0);
+  background-image: url('./assets/bg.png');
+  background-color: rgb(0, 0, 0, 0.5);
+  background-blend-mode: overlay;
 }
 
 a:hover {
@@ -26,4 +27,17 @@ button {
 input {
   background-color: white;
   color: black;
+}
+
+@keyframes move-bg {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: 1000px;
+  }
+}
+
+.bg-move {
+  animation: move-bg 25s linear infinite;
 }
