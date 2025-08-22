@@ -25,7 +25,7 @@ export default function RaceControls() {
   };
 
   return (
-    <div className={`mt-10 flex gap-11`}>
+    <div className={`flex gap-11`}>
       <button
         onClick={handleRace}
         className={`px-2 rounded-md border-2 text-lg border-red-500

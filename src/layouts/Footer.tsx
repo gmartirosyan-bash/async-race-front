@@ -1,15 +1,18 @@
-import { useAppSelector, useAppDispatch } from '../../redux/hooks';
-import { nextPage, prevPage, resetCars } from '../../redux/features/garageSlice';
+import { useAppSelector, useAppDispatch } from '../redux/hooks';
+import { nextPage, prevPage, resetCars } from '../redux/features/garageSlice';
 import { SquareChevronLeft, SquareChevronRight } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
-const Page = () => {
+export default function Footer() {
   const page = useAppSelector((state) => state.garage.page);
   const carsCount = useAppSelector((state) => state.garage.carsCount);
   const raceStatus = useAppSelector((status) => status.garage.raceStatus);
 
+  const location = useLocation();
   const dispatch = useAppDispatch();
 
   const isRacing = raceStatus === 'racing';
+  const isOnGarage = location.pathname === '/garage';
 
   const handlePrevPage = () => {
     dispatch(resetCars());
@@ -44,9 +47,9 @@ const Page = () => {
           <SquareChevronRight strokeWidth={3} size={25} />
         </button>
       </div>
-      <div className="text-3xl text-neutral-300">GARAGE ({carsCount})</div>
+      <div className="text-3xl text-neutral-300">
+        {isOnGarage ? 'GARAGE' : 'WINNERS'} ({carsCount})
+      </div>
     </div>
   );
-};
-
-export default Page;
+}

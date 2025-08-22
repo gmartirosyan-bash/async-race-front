@@ -1,15 +1,11 @@
 import CarForm from './CarForm';
 import RaceControls from './RaceControls';
-import NavButtons from '../NavButtons';
 
 export default function GarageMenu() {
   return (
-    <div className="mt-10 mb-20">
-      <div>
-        <NavButtons />
-        <CarForm />
-        <RaceControls />
-      </div>
+    <div className="mt-20 mb-7 flex items-center justify-around gap-60">
+      <RaceControls />
+      <CarForm />
     </div>
   );
 }

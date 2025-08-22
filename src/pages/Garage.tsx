@@ -4,7 +4,6 @@ import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GarageMenu from '../components/Garage/GarageMenu';
 import GarageCars from '../components/Garage/GarageCars';
 import Border from '../components/Garage/Border';
-import Page from '../components/Garage/Page';
 import LoadingIndicator from '../components/LoadingIndicator';
 import WinnerMsg from '../components/WinnerMsg';
 import EmptyGarage from '../components/Garage/EmpyGarage';
@@ -47,7 +46,6 @@ export default function Garage() {
         {carsCount === 0 && <EmptyGarage />}
         <GarageCars />
         <Border />
-        <Page />
       </div>
     </>
   );

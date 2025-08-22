@@ -24,11 +24,6 @@ button {
   cursor: pointer;
 }
 
-input {
-  background-color: white;
-  color: black;
-}
-
 @keyframes move-bg {
   0% {
     background-position-x: 0;
