@@ -37,7 +37,7 @@ export default function CarForm() {
           Car Name
         </label>
         <input
-          className="px-3 py-2 rounded bg-neutral-800 text-white border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="px-3 py-2 rounded bg-neutral-800 text-white border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-red-700"
           id="car-name"
           placeholder="Enter car name"
           type="text"
@@ -47,7 +47,7 @@ export default function CarForm() {
         />
         <label className="ml-2 inline-flex items-center space-x-2 cursor-pointer">
           <span
-            className="w-10 h-10 rounded border-red-800 border-3 active:scale-90"
+            className="w-10 h-10 rounded border-red-800 border-5 active:scale-90"
             style={{ backgroundColor: color }}
           />
           <input

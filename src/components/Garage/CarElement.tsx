@@ -1,7 +1,7 @@
 import { useAppSelector } from '../../redux/hooks';
 import carSvgs from '../../assets/carSvgs';
 import { useEffect, useRef } from 'react';
-import type { Car } from '../../types/car';
+import type { Car } from '../../types/types';
 
 interface CarElementProps {
   car: Car;

@@ -1,4 +1,4 @@
-import type { Car } from '../types/car';
+import type { Car } from '../types/types';
 
 const URL = 'http://localhost:3000/garage';
 

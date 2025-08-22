@@ -1,4 +1,4 @@
-import type { Start } from '../types/car';
+import type { Start } from '../types/types';
 
 const URL = 'http://localhost:3000/engine';
 
