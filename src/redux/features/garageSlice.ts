@@ -52,6 +52,16 @@ export const fetchCars = createAsyncThunk<
   }
 });
 
+export const fetchCar = createAsyncThunk<Car, number>('garage/fetchCar', async (id) => {
+  try {
+    const data = await carsApi.getCarApi(id);
+    return data;
+  } catch (err) {
+    console.error('Failed to fetch the car:', err);
+    throw err;
+  }
+});
+
 export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
   'garage/addCar',
   async (newCar) => {
@@ -59,7 +69,7 @@ export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
       const data = await carsApi.addCarApi(newCar);
       return data;
     } catch (err) {
-      console.error('Failed to add a cars:', err);
+      console.error('Failed to add a car:', err);
       throw err;
     }
   },
@@ -75,7 +85,7 @@ export const removeCar = createAsyncThunk<number, number, { dispatch: AppDispatc
 
       return id;
     } catch (err) {
-      console.error('Failed to remove the cars:', err);
+      console.error('Failed to remove the car:', err);
       throw err;
     }
   },
@@ -89,7 +99,7 @@ export const updateCar = createAsyncThunk<
     const data = await carsApi.updateCarApi(id, newCar);
     return data;
   } catch (err) {
-    console.error('Failed to update the cars:', err);
+    console.error('Failed to update the car:', err);
     throw err;
   }
 });
@@ -103,7 +113,7 @@ export const startCar = createAsyncThunk<MovingCar, number, { dispatch: AppDispa
       const time = data.distance / data.velocity;
       return { id, time, broke: false };
     } catch (err) {
-      console.error('Failed to start the cars:', err);
+      console.error('Failed to start the car:', err);
       throw err;
     }
   },
@@ -123,7 +133,7 @@ export const driveCar = createAsyncThunk<
     if (typeof err === 'number' && err === 500) {
       return rejectWithValue(id);
     }
-    console.error('Failed to remove the cars:', err);
+    console.error('Failed to remove the car :', err);
     throw err;
   }
 });
