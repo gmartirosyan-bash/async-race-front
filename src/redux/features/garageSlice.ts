@@ -199,7 +199,7 @@ const garageSlice = createSlice({
       state.selected = null;
       state.raceStatus = 'idle';
     },
-    nextPage(state) {
+    nextCarsPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
       } else if (state.page === Math.ceil(state.carsCount / 7)) {
@@ -208,7 +208,7 @@ const garageSlice = createSlice({
         state.page += 1;
       }
     },
-    prevPage(state) {
+    prevCarsPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
       } else if (state.page === 1 || state.carsCount === 0) {
@@ -274,8 +274,8 @@ const garageSlice = createSlice({
 export const {
   setCars,
   setSelected,
-  nextPage,
-  prevPage,
+  nextCarsPage,
+  prevCarsPage,
   addPendingMoving,
   removePendingMoving,
   setLoading,

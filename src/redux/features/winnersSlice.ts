@@ -81,6 +81,24 @@ const winnerSlice = createSlice({
     clearWinner(state) {
       state.currentWinner = null;
     },
+    nextWinnersPage(state) {
+      if (state.winnersCount === 0) {
+        state.page = 1;
+      } else if (state.page === Math.ceil(state.winnersCount / 10)) {
+        state.page = 1;
+      } else {
+        state.page += 1;
+      }
+    },
+    prevWinnersPage(state) {
+      if (state.winnersCount === 0) {
+        state.page = 1;
+      } else if (state.page === 1 || state.winnersCount === 0) {
+        state.page = Math.ceil(state.winnersCount / 10);
+      } else {
+        state.page -= 1;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -97,5 +115,5 @@ const winnerSlice = createSlice({
   },
 });
 
-export const { clearWinner } = winnerSlice.actions;
+export const { clearWinner, nextWinnersPage, prevWinnersPage } = winnerSlice.actions;
 export default winnerSlice.reducer;
