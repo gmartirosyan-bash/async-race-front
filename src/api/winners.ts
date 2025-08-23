@@ -6,9 +6,19 @@ interface Winner {
   time: number;
 }
 
+const getWinnersApi = async (page: number): Promise<{ winners: Winner[]; totalCount: number }> => {
+  const res = await fetch(`${URL}?_page=${page}&_limit=10`);
+  if (!res.ok) throw new Error(`Failed to fetch winners: ${res.status}`);
+
+  const totalCount = Number(res.headers.get('X-Total-Count'));
+  const winners = (await res.json()) as Winner[];
+
+  return { winners, totalCount };
+};
+
 const getWinnerApi = async (id: number): Promise<Winner> => {
   const res = await fetch(`${URL}/${id}`);
-  if (!res.ok) throw new Error(`failed to fetch the winner: ${res.status}`);
+  if (!res.ok) throw new Error(`Failed to fetch the winner: ${res.status}`);
   return (await res.json()) as Winner;
 };
 
@@ -32,4 +42,4 @@ const updateWinnerApi = async (id: number, carObj: Omit<Winner, 'id'>): Promise<
   return (await res.json()) as Winner;
 };
 
-export default { getWinnerApi, addWinnerApi, updateWinnerApi };
+export default { getWinnersApi, getWinnerApi, addWinnerApi, updateWinnerApi };
