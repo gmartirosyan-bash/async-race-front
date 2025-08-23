@@ -25,7 +25,7 @@ export default function Header() {
           <Link
             to="/garage"
             className={`p-4 px-6 mr-4 bg-blue-500 text-white 
-              font-semibold rounded-lg hover:bg-blue-600 
+              font-semibold rounded-lg hover:bg-blue-600
               ${isRacing || isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
           >
             TO GARAGE <DoorClosed className="inline" />

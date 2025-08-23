@@ -2,6 +2,8 @@
 
 @theme {
   --font-roboto: 'Roboto', sans-serif;
+  --font-bitcount: 'Bitcount', system-ui;
+  --font-orbitron: 'Orbitron', sans-serif;
 }
 
 body {

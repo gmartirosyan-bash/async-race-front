@@ -12,5 +12,6 @@ export interface Start {
 export interface Winner {
   id: number;
   name: string;
-  duration: number;
+  wins: number;
+  time: number;
 }

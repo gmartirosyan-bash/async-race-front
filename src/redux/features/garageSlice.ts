@@ -6,7 +6,7 @@ import type { RootState, AppDispatch } from '../store';
 
 interface MovingCar {
   id: number;
-  duration: number;
+  time: number;
   broke: boolean;
 }
 
@@ -101,8 +101,8 @@ export const startCar = createAsyncThunk<MovingCar, number, { dispatch: AppDispa
     try {
       dispatch(addPendingMoving(id));
       const data = (await engineApi.raceApi(id, 'started')) as Start;
-      const duration = data.distance / data.velocity;
-      return { id, duration, broke: false };
+      const time = data.distance / data.velocity;
+      return { id, time, broke: false };
     } catch (err) {
       console.error('Failed to start the cars:', err);
       throw err;
@@ -251,9 +251,9 @@ const garageSlice = createSlice({
       })
       .addCase(raceCars.fulfilled, (state, action) => {
         const id = action.payload;
-        const duration = state.moving.find((m) => m.id === id)?.duration;
+        const time = state.moving.find((m) => m.id === id)?.time;
         const name = state.cars.find((car) => car.id === id)?.name;
-        if (name && duration) state.winner = { id, name, duration };
+        if (name && time) state.winner = { id, name, time, wins: 0 };
         state.raceStatus = 'finished';
       })
       .addCase(raceCars.rejected, (state) => {

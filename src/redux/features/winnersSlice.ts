@@ -1,14 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  winners: [
-    {
-      id: 1,
-      wins: 1,
-      time: 10,
-    },
-  ],
+interface Winner {
+  id: number;
+  img: number;
+  color: string;
+  name: string;
+  wins: number;
+  time: number;
+}
+
+interface WinnersState {
+  winners: Winner[];
+}
+
+const initialState: WinnersState = {
+  winners: [],
 };
+
+// export const fetchWinners = createAsyncThunk<>(
+//   'winners/fetchWinners',
+//   async () => {
+
+//   }
+// )
 
 const winnersSlice = createSlice({
   name: 'winners',

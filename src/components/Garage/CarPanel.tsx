@@ -86,7 +86,9 @@ export default function CarPanel({ car }: CarPanelProps) {
         >
           STOP
         </button>
-        <p className="absolute left-85 text-5xl -z-10 opacity-40 min-w-200">{car.name}</p>
+        <p className="absolute font-bitcount font-extralight text-amber-200 left-85 top-3 text-5xl -z-10 min-w-200">
+          {car.name}
+        </p>
       </div>
     </div>
   );
