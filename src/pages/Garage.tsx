@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { clearWinner, fetchCars } from '../redux/features/garageSlice';
+import { fetchCars } from '../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GarageMenu from '../components/Garage/GarageMenu';
 import GarageCars from '../components/Garage/GarageCars';
@@ -7,12 +7,13 @@ import Border from '../components/Garage/Border';
 import LoadingIndicator from '../components/LoadingIndicator';
 import WinnerMsg from '../components/WinnerMsg';
 import EmptyGarage from '../components/Garage/EmpyGarage';
+import { clearWinner } from '../redux/features/winnersSlice';
 
 export default function Garage() {
   const loading = useAppSelector((state) => state.garage.loading);
-  const winner = useAppSelector((state) => state.garage.winner);
   const page = useAppSelector((state) => state.garage.page);
   const carsCount = useAppSelector((state) => state.garage.carsCount);
+  const winner = useAppSelector((state) => state.winners.currentWinner);
 
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [showWinner, setShowWinner] = useState(false);
@@ -36,6 +37,7 @@ export default function Garage() {
       return () => clearTimeout(timer);
     }
   }, [dispatch, winner]);
+
   if (loading) return <LoadingIndicator />;
   return (
     <>

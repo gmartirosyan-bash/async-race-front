@@ -25,7 +25,7 @@ export default function RaceControls() {
   };
 
   return (
-    <div className={`flex gap-11 font-orbitron`}>
+    <div className={`flex gap-6 font-orbitron`}>
       <button
         onClick={handleRace}
         className={`px-3 py-1 rounded-md border-2 text-lg border-red-500

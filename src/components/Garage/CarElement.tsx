@@ -40,7 +40,11 @@ export default function CarElement({ car }: CarElementProps) {
         >
           <CarSvg className="w-40 h-20" fill={car.color} />
         </div>
-        <img src="/finish.png" alt="" className="w-8 absolute -z-10 left-[95%]" />
+        <img
+          src="/prefinish.png"
+          alt=""
+          className="w-25 scale-160 absolute -z-10 -top-2 left-[92%]"
+        />
       </div>
     </>
   );

@@ -12,6 +12,7 @@ export interface Start {
 export interface Winner {
   id: number;
   name: string;
+  color: string;
   wins: number;
   time: number;
 }

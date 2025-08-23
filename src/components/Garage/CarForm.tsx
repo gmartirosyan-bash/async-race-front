@@ -5,7 +5,7 @@ import createRandomCars from '../../utils/carGenerator';
 
 export default function CarForm() {
   const [name, setName] = useState<string>('');
-  const [color, setColor] = useState<string>('#ffffff');
+  const [color, setColor] = useState<string>('#3C3232');
 
   const selected = useAppSelector((state) => state.garage.selected);
 
@@ -16,7 +16,6 @@ export default function CarForm() {
       setColor(selected.color);
     } else {
       setName('');
-      setColor('#ffffff');
     }
   }, [selected]);
   const handleAddCar = (e: React.FormEvent) => {
@@ -35,7 +34,7 @@ export default function CarForm() {
 
   return (
     <>
-      <form onSubmit={handleAddCar} className="flex items-center">
+      <form onSubmit={handleAddCar} className="flex items-center font-orbitron">
         <label htmlFor="car-name" className="sr-only">
           Car Name
         </label>

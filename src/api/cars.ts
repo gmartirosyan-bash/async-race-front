@@ -12,6 +12,12 @@ const getCarsApi = async (page: number): Promise<{ cars: Car[]; totalCount: numb
   return { cars, totalCount };
 };
 
+const getCarApi = async (id: number): Promise<Car> => {
+  const res = await fetch(`${URL}/${id}`);
+  if (!res.ok) throw Error(`failed to remove the car: ${res.status}`);
+  return (await res.json()) as Car;
+};
+
 const addCarApi = async (carObj: { name: string; color: string }): Promise<Car> => {
   const res = await fetch(URL, {
     method: 'POST',
@@ -39,4 +45,4 @@ const updateCarApi = async (id: number, carObj: { name: string; color: string })
   return (await res.json()) as Car;
 };
 
-export default { getCarsApi, addCarApi, removeCarApi, updateCarApi };
+export default { getCarsApi, getCarApi, addCarApi, removeCarApi, updateCarApi };

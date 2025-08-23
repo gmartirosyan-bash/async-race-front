@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import carsApi from '../../api/cars';
 import engineApi from '../../api/race';
-import type { Car, Start, Winner } from '../../types/types';
+import type { Car, Start } from '../../types/types';
 import type { RootState, AppDispatch } from '../store';
+import { declareWinner } from './winnersSlice';
 
 interface MovingCar {
   id: number;
@@ -18,7 +19,6 @@ interface GarageState {
   selected: Car | null;
   moving: MovingCar[];
   pendingMoving: number[];
-  winner: Winner | null;
   page: number;
   carsCount: number;
   raceStatus: RaceStatus;
@@ -30,7 +30,6 @@ const initialState: GarageState = {
   selected: null,
   moving: [],
   pendingMoving: [],
-  winner: null,
   page: 1,
   carsCount: 0,
   raceStatus: 'idle',
@@ -143,7 +142,7 @@ export const stopCar = createAsyncThunk<number, number>(
   },
 );
 
-export const raceCars = createAsyncThunk<number, void, { state: RootState; dispatch: AppDispatch }>(
+export const raceCars = createAsyncThunk<Car, void, { state: RootState; dispatch: AppDispatch }>(
   'garage/raceCars',
   async (_, { getState, dispatch }) => {
     const cars = getState().garage.cars;
@@ -151,12 +150,19 @@ export const raceCars = createAsyncThunk<number, void, { state: RootState; dispa
     const drivePromises = cars.map((car) =>
       dispatch(driveCar(car.id))
         .unwrap()
-        .then(() => car.id),
+        .then(() => car),
     );
 
     try {
-      const winnerId = await Promise.any(drivePromises);
-      return winnerId;
+      const winner = await Promise.any(drivePromises);
+      const state = getState().garage;
+      // console.log('📦 moving array:', JSON.stringify(latestGarage.moving, null, 2));
+      const id = winner.id;
+      const color = winner.color;
+      const time = state.moving.find((m) => m.id === id)?.time;
+      const name = state.cars.find((car) => car.id === id)?.name;
+      if (name && time) dispatch(declareWinner({ id, time, name, color }));
+      return winner;
     } catch (err) {
       console.error('Failed to stop the car:', err);
       throw err;
@@ -209,9 +215,6 @@ const garageSlice = createSlice({
     removePendingMoving: (state, action: PayloadAction<number>) => {
       state.pendingMoving = state.pendingMoving.filter((id) => id !== action.payload);
     },
-    clearWinner: (state) => {
-      state.winner = null;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -249,11 +252,7 @@ const garageSlice = createSlice({
         state.raceStatus = 'racing';
         state.selected = null;
       })
-      .addCase(raceCars.fulfilled, (state, action) => {
-        const id = action.payload;
-        const time = state.moving.find((m) => m.id === id)?.time;
-        const name = state.cars.find((car) => car.id === id)?.name;
-        if (name && time) state.winner = { id, name, time, wins: 0 };
+      .addCase(raceCars.fulfilled, (state) => {
         state.raceStatus = 'finished';
       })
       .addCase(raceCars.rejected, (state) => {
@@ -270,7 +269,6 @@ export const {
   addPendingMoving,
   removePendingMoving,
   setLoading,
-  clearWinner,
   resetCars,
 } = garageSlice.actions;
 export default garageSlice.reducer;

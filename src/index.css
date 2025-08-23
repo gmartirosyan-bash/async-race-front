@@ -25,16 +25,3 @@ h1 {
 button {
   cursor: pointer;
 }
-
-@keyframes move-bg {
-  0% {
-    background-position-x: 0;
-  }
-  100% {
-    background-position-x: 1000px;
-  }
-}
-
-.bg-move {
-  animation: move-bg 25s linear infinite;
-}
