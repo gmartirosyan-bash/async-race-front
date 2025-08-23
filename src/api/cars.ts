@@ -35,7 +35,7 @@ const removeCarApi = async (id: number) => {
   if (!res.ok) throw Error(`failed to remove the car: ${res.status}`);
 };
 
-const updateCarApi = async (id: number, carObj: { name: string; color: string }): Promise<Car> => {
+const updateCarApi = async (id: number, carObj: Omit<Car, 'id'>): Promise<Car> => {
   const res = await fetch(`${URL}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

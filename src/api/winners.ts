@@ -22,8 +22,14 @@ const addWinnerApi = async (carObj: Winner): Promise<Winner> => {
   return (await res.json()) as Winner;
 };
 
-// const updateWinnerApi = async (carObj: Winner): Promise<Winner> => {
-//   con
-// }
+const updateWinnerApi = async (id: number, carObj: Omit<Winner, 'id'>): Promise<Winner> => {
+  const res = await fetch(`${URL}/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(carObj),
+  });
+  if (!res.ok) throw new Error(`Failed to update the winner: ${res.status}`);
+  return (await res.json()) as Winner;
+};
 
-export default { getWinnerApi, addWinnerApi };
+export default { getWinnerApi, addWinnerApi, updateWinnerApi };

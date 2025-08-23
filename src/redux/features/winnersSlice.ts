@@ -16,26 +16,31 @@ export const declareWinner = createAsyncThunk<
   Winner,
   { id: number; time: number; name: string; color: string }
 >('winners/declareWinner', async ({ id, time, name, color }) => {
-  let wins = 0;
   try {
-    const data = await winnersApi.getWinnerApi(id);
-    wins = data.wins;
-    time = Math.min(data.time, time);
-  } catch {
-    wins = 0;
+    let wins: number;
+    let bestTime: number;
+    try {
+      const existing = await winnersApi.getWinnerApi(id);
+      wins = existing.wins + 1;
+      bestTime = Math.min(existing.time, time);
+
+      await winnersApi.updateWinnerApi(id, { time: bestTime, wins });
+    } catch (err) {
+      if (err instanceof Error) {
+        wins = 1;
+        bestTime = time;
+        await winnersApi.addWinnerApi({ id, time: bestTime, wins });
+      } else {
+        console.error('Failed to get or update the winner:', err);
+        throw err;
+      }
+    }
+
+    return { id, name, color, time: bestTime, wins };
+  } catch (err) {
+    console.error('Failed to declare the winner:', err);
+    throw err;
   }
-  console.log('hey');
-  const winner: Winner = {
-    id,
-    name,
-    color,
-    time,
-    wins: wins + 1,
-  };
-
-  winnersApi.addWinnerApi({ id, time, wins });
-
-  return winner;
 });
 
 const winnerSlice = createSlice({
