@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import { Crown } from 'lucide-react';
-import type { CurrentWinner } from '../types/types';
+import type { CurrentWinner } from '../../types/types';
 
 export default function WinnerMsg({ winner }: { winner: CurrentWinner }) {
   return createPortal(

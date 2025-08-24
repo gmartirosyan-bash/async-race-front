@@ -9,7 +9,6 @@ export type RaceStatus = 'idle' | 'racing' | 'finished';
 
 interface GarageState {
   cars: Car[];
-  loading: boolean;
   selected: Car | null;
   moving: MovingCar[];
   pendingMoving: number[];
@@ -20,7 +19,6 @@ interface GarageState {
 
 const initialState: GarageState = {
   cars: [],
-  loading: false,
   selected: null,
   moving: [],
   pendingMoving: [],
@@ -31,14 +29,12 @@ const initialState: GarageState = {
 
 export const fetchCars = createAsyncThunk<
   { cars: Car[]; totalCount: number },
-  boolean,
-  { state: RootState; dispatch: AppDispatch }
->('garage/fetchCars', async (firstRender, { getState, dispatch }) => {
+  void,
+  { state: RootState }
+>('garage/fetchCars', async (_, { getState }) => {
   const page = getState().garage.page;
   try {
-    if (firstRender) dispatch(setLoading(true));
     const data = await carsApi.getCarsApi(page);
-    if (firstRender) dispatch(setLoading(false));
     return data;
   } catch (err) {
     console.error('Failed to fetch the cars:', err);
@@ -46,36 +42,39 @@ export const fetchCars = createAsyncThunk<
   }
 });
 
-export const fetchCar = createAsyncThunk<Car, number, { dispatch: AppDispatch }>(
+export const fetchCar = createAsyncThunk<Car | undefined, number, { dispatch: AppDispatch }>(
   'garage/fetchCar',
-  async (id, { dispatch }) => {
+  async (id, { dispatch, rejectWithValue }) => {
     try {
       const data = await carsApi.getCarApi(id);
       return data;
     } catch (err: unknown) {
-      dispatch(removeWinner(id)).catch((err) => {
-        if (err?.response?.status !== 500) {
-          console.error("Car wasn't in winners: ", err);
+      if (err instanceof Response) {
+        if (err.status === 404) {
+          dispatch(removeWinner(id));
+          return undefined;
         }
-      });
-      console.error(err);
-      throw err;
+        return rejectWithValue(`Failed to remove winner (status ${err.status} ${err.statusText})`);
+      }
+      return rejectWithValue(`Failed to remove winner (unknown error)`);
     }
   },
 );
 
-export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
-  'garage/addCar',
-  async (newCar) => {
-    try {
-      const data = await carsApi.addCarApi(newCar);
-      return data;
-    } catch (err) {
-      console.error('Failed to add a car:', err);
-      throw err;
-    }
-  },
-);
+export const addCar = createAsyncThunk<
+  Car,
+  { name: string; color: string },
+  { rejectValue: string }
+>('garage/addCar', async (newCar, { rejectWithValue }) => {
+  try {
+    const data = await carsApi.addCarApi(newCar);
+    return data;
+  } catch (err: unknown) {
+    if (err instanceof Response)
+      return rejectWithValue(`Failed to add a car (status ${err.status} ${err.statusText})`);
+    return rejectWithValue('Failed to add a car (unknown error)');
+  }
+});
 
 export const removeCar = createAsyncThunk<number, number, { dispatch: AppDispatch }>(
   'garage/removeCar',
@@ -84,12 +83,8 @@ export const removeCar = createAsyncThunk<number, number, { dispatch: AppDispatc
       dispatch(removePendingMoving(id));
       dispatch(removeMoving(id));
       await carsApi.removeCarApi(id);
-      dispatch(fetchCars(false));
-      dispatch(removeWinner(id)).catch((err) => {
-        if (err?.response?.status !== 404) {
-          console.error("Car wasn't in winners: ", err);
-        }
-      });
+      dispatch(fetchCars());
+      dispatch(removeWinner(id));
       return id;
     } catch (err) {
       console.error('Failed to remove the car:', err);
@@ -101,13 +96,14 @@ export const removeCar = createAsyncThunk<number, number, { dispatch: AppDispatc
 export const updateCar = createAsyncThunk<
   Car,
   { id: number; newCar: { name: string; color: string } }
->('garage/updateCar', async ({ id, newCar }) => {
+>('garage/updateCar', async ({ id, newCar }, { rejectWithValue }) => {
   try {
     const data = await carsApi.updateCarApi(id, newCar);
     return data;
-  } catch (err) {
-    console.error('Failed to update the car:', err);
-    throw err;
+  } catch (err: unknown) {
+    if (err instanceof Response)
+      return rejectWithValue(`Failed to update the car (status ${err.status} ${err.statusText})`);
+    return rejectWithValue('Failed to update the car (unknown error)');
   }
 });
 
@@ -137,24 +133,25 @@ export const driveCar = createAsyncThunk<
     const data = await engineApi.raceApi(id, 'drive');
     return data as Start;
   } catch (err: unknown) {
-    if (typeof err === 'number' && err === 500) {
+    if (err instanceof Response && err.status === 500) {
       return rejectWithValue(id);
     }
-    console.error('Failed to remove the car :', err);
+    console.error('Failed to drive the car :', err);
     throw err;
   }
 });
 
 export const stopCar = createAsyncThunk<number, number>(
   'garage/stopCar',
-  async (id, { dispatch }) => {
+  async (id, { dispatch, rejectWithValue }) => {
     try {
       dispatch(removePendingMoving(id));
       await engineApi.raceApi(id, 'stopped');
       return id;
-    } catch (err) {
-      console.error('Failed to stop the car:', err);
-      throw err;
+    } catch (err: unknown) {
+      if (err instanceof Response)
+        return rejectWithValue(`Failed to stop the car (status ${err.status} ${err.statusText})`);
+      return rejectWithValue('Failed to stop the car (unknown error)');
     }
   },
 );
@@ -165,7 +162,7 @@ export const resetCars = createAsyncThunk<void, void, { state: RootState; dispat
     const moving: MovingCar[] = getState().garage.moving;
     dispatch(fastResetCars());
     try {
-      await dispatch(fetchCars(false));
+      await dispatch(fetchCars());
       await Promise.all(
         moving.map(async (m) => {
           await dispatch(stopCar(m.id));
@@ -180,14 +177,13 @@ export const resetCars = createAsyncThunk<void, void, { state: RootState; dispat
 
 export const raceCars = createAsyncThunk<Car, void, { state: RootState; dispatch: AppDispatch }>(
   'garage/raceCars',
-  async (_, { getState, dispatch }) => {
+  async (_, { getState, dispatch, rejectWithValue }) => {
     const cars = getState().garage.cars;
 
-    const drivePromises = cars.map((car) =>
-      dispatch(driveCar(car.id))
-        .unwrap()
-        .then(() => car),
-    );
+    const drivePromises = cars.map(async (car) => {
+      await dispatch(driveCar(car.id)).unwrap();
+      return car;
+    });
 
     try {
       const winner = await Promise.any(drivePromises);
@@ -197,9 +193,8 @@ export const raceCars = createAsyncThunk<Car, void, { state: RootState; dispatch
       const name = state.cars.find((car) => car.id === id)?.name;
       if (name && time) dispatch(declareWinner({ id, time, name }));
       return winner;
-    } catch (err) {
-      console.error('Failed to stop the car:', err);
-      throw err;
+    } catch {
+      return rejectWithValue('No car reached the end');
     }
   },
 );
@@ -214,9 +209,6 @@ const garageSlice = createSlice({
     setSelected(state, action: PayloadAction<Car | null>) {
       state.selected = action.payload;
     },
-    setLoading(state, aciton: PayloadAction<boolean>) {
-      state.loading = aciton.payload;
-    },
     nextCarsPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
@@ -229,7 +221,7 @@ const garageSlice = createSlice({
     prevCarsPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
-      } else if (state.page === 1 || state.carsCount === 0) {
+      } else if (state.page === 1) {
         state.page = Math.ceil(state.carsCount / 7);
       } else {
         state.page -= 1;
@@ -260,6 +252,12 @@ const garageSlice = createSlice({
           state.carsCount = action.payload.totalCount;
         },
       )
+      .addCase(fetchCar.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
+      })
+      .addCase(addCar.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
+      })
       .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
         if (state.cars.length < 7) state.cars.push(action.payload);
         state.carsCount++;
@@ -268,12 +266,18 @@ const garageSlice = createSlice({
         if (state.cars.length === 1 && state.page !== 1) state.page = state.page - 1;
         state.carsCount--;
       })
+      .addCase(updateCar.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
+      })
       .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
         state.cars = state.cars.map((car) => (car.id === action.payload.id ? action.payload : car));
       })
       .addCase(startCar.fulfilled, (state, action: PayloadAction<MovingCar>) => {
         if (state.pendingMoving.some((pm) => pm === action.payload.id))
           state.moving.push(action.payload);
+      })
+      .addCase(stopCar.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
       })
       .addCase(stopCar.fulfilled, (state, action: PayloadAction<number>) => {
         state.moving = state.moving.filter((car) => car.id !== action.payload);
@@ -294,7 +298,8 @@ const garageSlice = createSlice({
       .addCase(raceCars.fulfilled, (state) => {
         state.raceStatus = 'finished';
       })
-      .addCase(raceCars.rejected, (state) => {
+      .addCase(raceCars.rejected, (state, action) => {
+        console.error(action.payload ?? action.error.message);
         state.raceStatus = 'finished';
       });
   },
@@ -309,6 +314,5 @@ export const {
   removePendingMoving,
   removeMoving,
   fastResetCars,
-  setLoading,
 } = garageSlice.actions;
 export default garageSlice.reducer;

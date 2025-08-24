@@ -20,36 +20,37 @@ const initialState: WinnerState = {
 
 export const fetchWinners = createAsyncThunk<
   { winners: Winner[]; winnersCount: number },
-  void,
+  { sort?: 'wins' | 'time'; order?: 'ASC' | 'DESC' } | void,
   { state: RootState; dispatch: AppDispatch }
->('winners/fetchWinners', async (_, { getState, dispatch }) => {
+>('winners/fetchWinners', async (params, { getState, dispatch, rejectWithValue }) => {
   const page = getState().winners.page;
+  const sort = params?.sort;
+  const order = params?.order;
 
   try {
-    const data = await winnersApi.getWinnersApi(page);
+    const data = await winnersApi.getWinnersApi(page, sort, order);
+
     const winnersRaw: WinnerRaw[] = data.winners;
 
-    // const winners: Winner[] = await Promise.all(
-    //   winnersRaw.map(async (wr) => {
-    //     const car = await dispatch(fetchCar(wr.id)).unwrap();
-    //     return { ...wr, name: car.name, color: car.color };
-    //   }),
-    // );
-    const winners: Winner[] = (
-      await Promise.allSettled(
-        winnersRaw.map(async (wr) => {
+    const winners = await Promise.all(
+      winnersRaw.map(async (wr) => {
+        try {
           const car = await dispatch(fetchCar(wr.id)).unwrap();
+          if (!car) return null;
           return { ...wr, name: car.name, color: car.color };
-        }),
-      )
-    )
-      .filter((res): res is PromiseFulfilledResult<Winner> => res.status === 'fulfilled')
-      .map((res) => res.value);
+        } catch {
+          return null;
+        }
+      }),
+    );
+    const filteredWinners = winners.filter(Boolean) as Winner[];
 
-    return { winners, winnersCount: data.totalCount };
-  } catch (err) {
-    console.error('Failed to fetch the winners: ', err);
-    throw err;
+    return { winners: filteredWinners, winnersCount: data.totalCount };
+  } catch (err: unknown) {
+    if (err instanceof Response) {
+      return rejectWithValue(`Failed to fetch winners (status ${err.status} ${err.statusText})`);
+    }
+    return rejectWithValue('Failed to fetch winners (unknown error)');
   }
 });
 
@@ -57,42 +58,71 @@ export const declareWinner = createAsyncThunk<
   void,
   { id: number; time: number; name: string },
   { dispatch: AppDispatch }
->('winners/declareWinner', async ({ id, time, name }, { dispatch }) => {
+>('winners/declareWinner', async ({ id, time, name }, { dispatch, rejectWithValue }) => {
   dispatch(setWinner({ id, time, name }));
 
   try {
-    let wins: number;
-    let bestTime: number;
-    try {
-      const existing = await winnersApi.getWinnerApi(id);
-      wins = existing.wins + 1;
-      bestTime = Math.min(existing.time, time);
+    const existing = await winnersApi.getWinnerApi(id);
+    const wins = existing.wins + 1;
+    const bestTime = Math.min(existing.time, time);
 
-      await winnersApi.updateWinnerApi(id, { time: bestTime, wins });
-    } catch (err) {
-      if (err instanceof Error) {
-        wins = 1;
-        bestTime = time;
-        await winnersApi.addWinnerApi({ id, time: bestTime, wins });
-      } else {
-        console.error('Failed to get or update the winner:', err);
-        throw err;
-      }
+    await dispatch(updateWinner({ id, time: bestTime, wins })).unwrap();
+  } catch (err: unknown) {
+    if (err instanceof Response && err.status === 404) {
+      const wins = 1;
+      const bestTime = time;
+
+      await dispatch(addWinner({ id, time: bestTime, wins })).unwrap();
+    } else if (err instanceof Response) {
+      return rejectWithValue(`Failed to get winner (status ${err.status} ${err.statusText})`);
+    } else {
+      return rejectWithValue('Failed to get winner (unknown error)');
     }
-  } catch (err) {
-    console.error('Failed to declare the winner:', err);
-    throw err;
   }
 });
 
-export const removeWinner = createAsyncThunk<void, number>('garage/removeWinner', async (id) => {
-  try {
-    await winnersApi.removeWinnerApi(id);
-  } catch (err) {
-    console.error('Failed to remove the car:', err);
-    throw err;
-  }
-});
+export const removeWinner = createAsyncThunk<void, number>(
+  'winners/removeWinner',
+  async (id, { rejectWithValue }) => {
+    try {
+      await winnersApi.removeWinnerApi(id);
+    } catch (err: unknown) {
+      if (err instanceof Response) {
+        if (err.status === 404) return;
+        return rejectWithValue(`Failed to remove winner (status ${err.status} ${err.statusText})`);
+      }
+      return rejectWithValue('Failed to remove winner (unknown error)');
+    }
+  },
+);
+
+export const updateWinner = createAsyncThunk<void, WinnerRaw>(
+  'winners/updateWinner',
+  async ({ id, time, wins }, { rejectWithValue }) => {
+    try {
+      await winnersApi.updateWinnerApi(id, { time, wins });
+    } catch (err: unknown) {
+      if (err instanceof Response) {
+        return rejectWithValue(`Failed to update winner (status ${err.status} ${err.statusText})`);
+      }
+      return rejectWithValue('Failed to update winner (unknown error)');
+    }
+  },
+);
+
+export const addWinner = createAsyncThunk<void, WinnerRaw>(
+  'winners/addWinner',
+  async ({ id, time, wins }, { rejectWithValue }) => {
+    try {
+      await winnersApi.addWinnerApi({ id, time, wins });
+    } catch (err: unknown) {
+      if (err instanceof Response) {
+        return rejectWithValue(`Failed to add winner (status ${err.status} ${err.statusText})`);
+      }
+      return rejectWithValue('Failed to add winner (unknown error)');
+    }
+  },
+);
 
 const winnerSlice = createSlice({
   name: 'winners',
@@ -116,7 +146,7 @@ const winnerSlice = createSlice({
     prevWinnersPage(state) {
       if (state.winnersCount === 0) {
         state.page = 1;
-      } else if (state.page === 1 || state.winnersCount === 0) {
+      } else if (state.page === 1) {
         state.page = Math.ceil(state.winnersCount / 10);
       } else {
         state.page -= 1;
@@ -132,8 +162,17 @@ const winnerSlice = createSlice({
           state.winnersCount = action.payload.winnersCount;
         },
       )
-      .addCase(removeWinner.fulfilled, () => {
-        // state.winnersCount--;
+      .addCase(fetchWinners.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
+      })
+      .addCase(declareWinner.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
+      })
+      .addCase(updateWinner.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
+      })
+      .addCase(removeWinner.rejected, (_, action) => {
+        console.error(action.payload ?? action.error.message);
       });
   },
 });

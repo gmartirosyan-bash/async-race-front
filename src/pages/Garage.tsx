@@ -4,26 +4,21 @@ import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GarageMenu from '../components/Garage/GarageMenu';
 import GarageCars from '../components/Garage/GarageCars';
 import Border from '../components/Garage/Border';
-import LoadingIndicator from '../components/LoadingIndicator';
-import WinnerMsg from '../components/WinnerMsg';
+import WinnerMsg from '../components/Garage/WinnerMsg';
 import EmptyGarage from '../components/Garage/EmpyGarage';
 import { clearWinner } from '../redux/features/winnersSlice';
 
 export default function Garage() {
-  const loading = useAppSelector((state) => state.garage.loading);
   const page = useAppSelector((state) => state.garage.page);
   const carsCount = useAppSelector((state) => state.garage.carsCount);
   const winner = useAppSelector((state) => state.winners.currentWinner);
 
-  const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [showWinner, setShowWinner] = useState(false);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchCars(initialLoad));
-    setInitialLoad(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    dispatch(fetchCars());
   }, [dispatch, page]);
 
   useEffect(() => {
@@ -38,7 +33,6 @@ export default function Garage() {
     }
   }, [dispatch, winner]);
 
-  if (loading) return <LoadingIndicator />;
   return (
     <>
       {showWinner && winner && <WinnerMsg winner={winner} />}
