@@ -134,6 +134,9 @@ const winnerSlice = createSlice({
     clearWinner(state) {
       state.currentWinner = null;
     },
+    clearWinners(state) {
+      state.winners = [];
+    },
     nextWinnersPage(state) {
       if (state.winnersCount === 0) {
         state.page = 1;
@@ -177,5 +180,6 @@ const winnerSlice = createSlice({
   },
 });
 
-export const { setWinner, clearWinner, nextWinnersPage, prevWinnersPage } = winnerSlice.actions;
+export const { setWinner, clearWinner, clearWinners, nextWinnersPage, prevWinnersPage } =
+  winnerSlice.actions;
 export default winnerSlice.reducer;

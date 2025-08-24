@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import carsApi from '../../api/cars';
 import engineApi from '../../api/race';
-import type { Car, MovingCar, Start } from '../../types/types';
-import type { RootState, AppDispatch } from '../store';
 import { declareWinner, removeWinner } from './winnersSlice';
-
-export type RaceStatus = 'idle' | 'racing' | 'finished';
+import type { Car, MovingCar, Start, RaceStatus } from '../../types/types';
+import type { RootState, AppDispatch } from '../store';
 
 interface GarageState {
   cars: Car[];
+  carName: string;
+  carColor: string;
   selected: Car | null;
   moving: MovingCar[];
   pendingMoving: number[];
@@ -19,6 +19,8 @@ interface GarageState {
 
 const initialState: GarageState = {
   cars: [],
+  carName: '',
+  carColor: '#707070',
   selected: null,
   moving: [],
   pendingMoving: [],
@@ -206,6 +208,12 @@ const garageSlice = createSlice({
     setCars(state, action: PayloadAction<Car[]>) {
       state.cars = action.payload;
     },
+    setName(state, action: PayloadAction<string>) {
+      state.carName = action.payload;
+    },
+    setColor(state, action: PayloadAction<string>) {
+      state.carColor = action.payload;
+    },
     setSelected(state, action: PayloadAction<Car | null>) {
       state.selected = action.payload;
     },
@@ -229,7 +237,6 @@ const garageSlice = createSlice({
     },
     fastResetCars(state) {
       state.moving = [];
-      state.selected = null;
     },
     addPendingMoving(state, action: PayloadAction<number>) {
       if (!state.pendingMoving.includes(action.payload)) {
@@ -307,6 +314,8 @@ const garageSlice = createSlice({
 
 export const {
   setCars,
+  setName,
+  setColor,
   setSelected,
   nextCarsPage,
   prevCarsPage,

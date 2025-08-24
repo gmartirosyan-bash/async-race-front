@@ -15,6 +15,8 @@ export interface Start {
   distance: number;
 }
 
+export type RaceStatus = 'idle' | 'racing' | 'finished';
+
 export interface Winner {
   id: number;
   name: string;

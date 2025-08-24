@@ -2,39 +2,41 @@ import { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import carSvgs from '../../utils/carSvgs';
 import { fetchWinners } from '../../redux/features/winnersSlice';
-import EmptyWinners from './EmptyWinners';
-
-type SortKey = 'wins' | 'time';
-type SortOrder = 'asc' | 'desc';
 
 export default function WinnersTable() {
   const dispatch = useAppDispatch();
   const winners = useAppSelector((state) => state.winners.winners);
   const page = useAppSelector((state) => state.winners.page);
-  const winnersCount = useAppSelector((state) => state.winners.winnersCount);
 
-  const [sortKey, setSortKey] = useState<SortKey | null>(null);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [sortKey, setSortKey] = useState<'wins' | 'time' | null>(null);
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC' | null>(null);
 
   useEffect(() => {
     dispatch(
       fetchWinners({
         sort: sortKey ?? undefined,
-        order: sortOrder.toUpperCase() as 'ASC' | 'DESC',
+        order: sortOrder ?? undefined,
       }),
     );
   }, [page, sortKey, sortOrder, dispatch]);
 
-  const handleSort = (key: SortKey) => {
-    const order = sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc';
-    setSortKey(key);
-    setSortOrder(order);
+  const handleSort = (key: 'wins' | 'time') => {
+    if (sortKey === key) {
+      if (sortOrder === 'ASC') {
+        setSortOrder('DESC');
+      } else {
+        setSortOrder('ASC');
+      }
+    } else {
+      setSortKey(key);
+      setSortOrder('ASC');
+    }
   };
 
   return (
-    <div className="overflow-x-auto mt-20 max-w-350 m-auto">
-      <table className="min-w-full border-collapse border border-neutral-700 text-neutral-200">
-        <thead className="bg-neutral-800 text-left">
+    <div className="overflow-x-auto mt-20 max-w-300 m-auto">
+      <table className="table-fixed w-full border-collapse border border-neutral-700 text-neutral-200">
+        <thead className="bg-neutral-800 text-left font-orbitron">
           <tr>
             <th className="border border-neutral-700 px-4 py-2">Number</th>
             <th className="border border-neutral-700 px-4 py-2">Car</th>
@@ -45,7 +47,7 @@ export default function WinnersTable() {
             >
               Wins{' '}
               <span className="inline-block w-4">
-                {sortKey === 'wins' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                {sortKey === 'wins' ? (sortOrder === 'ASC' ? '↑' : '↓') : ''}
               </span>
             </th>
             <th
@@ -54,7 +56,7 @@ export default function WinnersTable() {
             >
               Best time (s){' '}
               <span className="inline-block w-4">
-                {sortKey === 'time' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                {sortKey === 'time' ? (sortOrder === 'ASC' ? '↑' : '↓') : ''}
               </span>
             </th>
           </tr>
@@ -70,13 +72,14 @@ export default function WinnersTable() {
                 </td>
                 <td className="border border-neutral-700 px-4 py-2">{winner.name}</td>
                 <td className="border border-neutral-700 px-4 py-2">{winner.wins}</td>
-                <td className="border border-neutral-700 px-4 py-2">{winner.time}</td>
+                <td className="border border-neutral-700 px-4 py-2">
+                  {Math.floor(winner.time) / 1000}
+                </td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      {winnersCount === 0 && <EmptyWinners />}
     </div>
   );
 }

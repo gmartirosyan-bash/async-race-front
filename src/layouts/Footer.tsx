@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { nextCarsPage, prevCarsPage, resetCars } from '../redux/features/garageSlice';
+import { nextCarsPage, prevCarsPage, resetCars, setSelected } from '../redux/features/garageSlice';
 import { SquareChevronLeft, SquareChevronRight } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { nextWinnersPage, prevWinnersPage } from '../redux/features/winnersSlice';
@@ -18,6 +18,7 @@ export default function Footer() {
   const isOnGarage = location.pathname === '/garage';
 
   const handlePrevPage = () => {
+    dispatch(setSelected(null));
     if (isOnGarage) {
       dispatch(resetCars());
       dispatch(prevCarsPage());
@@ -27,6 +28,7 @@ export default function Footer() {
   };
 
   const handleNextPage = () => {
+    dispatch(setSelected(null));
     if (isOnGarage) {
       dispatch(resetCars());
       dispatch(nextCarsPage());

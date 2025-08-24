@@ -1,23 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { addCar, setSelected, updateCar } from '../../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { setName, setColor } from '../../redux/features/garageSlice';
 import createRandomCars from '../../utils/carGenerator';
 
 export default function CarForm() {
-  const [name, setName] = useState<string>('');
-  const [color, setColor] = useState<string>('#3C3232');
-
   const selected = useAppSelector((state) => state.garage.selected);
+  const name = useAppSelector((state) => state.garage.carName);
+  const color = useAppSelector((state) => state.garage.carColor);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (selected) {
-      setName(selected.name);
-      setColor(selected.color);
-    } else {
-      setName('');
+      dispatch(setName(selected.name));
+      dispatch(setColor(selected.color));
     }
-  }, [selected]);
+  }, [selected, dispatch]);
+
   const handleAddCar = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !color.trim()) {
@@ -29,7 +28,7 @@ export default function CarForm() {
     } else {
       dispatch(addCar({ name, color }));
     }
-    setName('');
+    dispatch(setName(''));
   };
 
   return (
@@ -45,7 +44,7 @@ export default function CarForm() {
           type="text"
           maxLength={20}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => dispatch(setName(e.target.value))}
         />
         <label className="ml-2 inline-flex items-center space-x-2 cursor-pointer">
           <span
@@ -55,7 +54,7 @@ export default function CarForm() {
           <input
             type="color"
             value={color}
-            onChange={(e) => setColor(e.target.value)}
+            onChange={(e) => dispatch(setColor(e.target.value))}
             className="w-0 h-0 overflow-hidden opacity-0"
           />
         </label>

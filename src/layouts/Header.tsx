@@ -2,6 +2,7 @@ import { useAppSelector, useAppDispatch } from '../redux/hooks';
 import { resetCars } from '../redux/features/garageSlice';
 import { Link, useLocation } from 'react-router-dom';
 import { Crown, DoorClosed } from 'lucide-react';
+import { clearWinners } from '../redux/features/winnersSlice';
 
 export default function Header() {
   const raceStatus = useAppSelector((status) => status.garage.raceStatus);
@@ -11,6 +12,10 @@ export default function Header() {
 
   const handleToWinners = () => {
     dispatch(resetCars());
+  };
+
+  const handleToGarage = () => {
+    dispatch(clearWinners());
   };
 
   const isOnGarage = location.pathname === '/garage';
@@ -24,6 +29,7 @@ export default function Header() {
         <div>
           <Link
             to="/garage"
+            onClick={handleToGarage}
             className={`p-4 px-6 mr-4 bg-blue-500 text-white 
               font-semibold rounded-lg hover:bg-blue-600
               ${isRacing || isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
