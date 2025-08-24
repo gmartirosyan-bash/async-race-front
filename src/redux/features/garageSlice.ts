@@ -1,15 +1,9 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import carsApi from '../../api/cars';
 import engineApi from '../../api/race';
-import type { Car, Start } from '../../types/types';
+import type { Car, MovingCar, Start } from '../../types/types';
 import type { RootState, AppDispatch } from '../store';
-import { declareWinner } from './winnersSlice';
-
-interface MovingCar {
-  id: number;
-  time: number;
-  broke: boolean;
-}
+import { declareWinner, removeWinner } from './winnersSlice';
 
 export type RaceStatus = 'idle' | 'racing' | 'finished';
 
@@ -52,15 +46,23 @@ export const fetchCars = createAsyncThunk<
   }
 });
 
-export const fetchCar = createAsyncThunk<Car, number>('garage/fetchCar', async (id) => {
-  try {
-    const data = await carsApi.getCarApi(id);
-    return data;
-  } catch (err) {
-    console.error('Failed to fetch the car:', err);
-    throw err;
-  }
-});
+export const fetchCar = createAsyncThunk<Car, number, { dispatch: AppDispatch }>(
+  'garage/fetchCar',
+  async (id, { dispatch }) => {
+    try {
+      const data = await carsApi.getCarApi(id);
+      return data;
+    } catch (err: unknown) {
+      dispatch(removeWinner(id)).catch((err) => {
+        if (err?.response?.status !== 500) {
+          console.error("Car wasn't in winners: ", err);
+        }
+      });
+      console.error(err);
+      throw err;
+    }
+  },
+);
 
 export const addCar = createAsyncThunk<Car, { name: string; color: string }>(
   'garage/addCar',
@@ -80,9 +82,14 @@ export const removeCar = createAsyncThunk<number, number, { dispatch: AppDispatc
   async (id, { dispatch }) => {
     try {
       dispatch(removePendingMoving(id));
+      dispatch(removeMoving(id));
       await carsApi.removeCarApi(id);
       dispatch(fetchCars(false));
-
+      dispatch(removeWinner(id)).catch((err) => {
+        if (err?.response?.status !== 404) {
+          console.error("Car wasn't in winners: ", err);
+        }
+      });
       return id;
     } catch (err) {
       console.error('Failed to remove the car:', err);
@@ -240,6 +247,9 @@ const garageSlice = createSlice({
     removePendingMoving(state, action: PayloadAction<number>) {
       state.pendingMoving = state.pendingMoving.filter((id) => id !== action.payload);
     },
+    removeMoving(state, action: PayloadAction<number>) {
+      state.moving = state.moving.filter((m) => m.id !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -297,6 +307,7 @@ export const {
   prevCarsPage,
   addPendingMoving,
   removePendingMoving,
+  removeMoving,
   fastResetCars,
   setLoading,
 } = garageSlice.actions;

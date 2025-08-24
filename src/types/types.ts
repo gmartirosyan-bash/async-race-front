@@ -4,6 +4,12 @@ export interface Car {
   color: string;
 }
 
+export interface MovingCar {
+  id: number;
+  time: number;
+  broke: boolean;
+}
+
 export interface Start {
   velocity: number;
   distance: number;

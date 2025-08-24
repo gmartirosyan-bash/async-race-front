@@ -14,7 +14,7 @@ const getCarsApi = async (page: number): Promise<{ cars: Car[]; totalCount: numb
 
 const getCarApi = async (id: number): Promise<Car> => {
   const res = await fetch(`${URL}/${id}`);
-  if (!res.ok) throw Error(`failed to remove the car: ${res.status}`);
+  if (!res.ok) throw res.status;
   return (await res.json()) as Car;
 };
 

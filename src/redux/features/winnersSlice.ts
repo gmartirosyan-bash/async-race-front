@@ -29,12 +29,22 @@ export const fetchWinners = createAsyncThunk<
     const data = await winnersApi.getWinnersApi(page);
     const winnersRaw: WinnerRaw[] = data.winners;
 
-    const winners: Winner[] = await Promise.all(
-      winnersRaw.map(async (wr) => {
-        const car = await dispatch(fetchCar(wr.id)).unwrap();
-        return { ...wr, name: car.name, color: car.color };
-      }),
-    );
+    // const winners: Winner[] = await Promise.all(
+    //   winnersRaw.map(async (wr) => {
+    //     const car = await dispatch(fetchCar(wr.id)).unwrap();
+    //     return { ...wr, name: car.name, color: car.color };
+    //   }),
+    // );
+    const winners: Winner[] = (
+      await Promise.allSettled(
+        winnersRaw.map(async (wr) => {
+          const car = await dispatch(fetchCar(wr.id)).unwrap();
+          return { ...wr, name: car.name, color: car.color };
+        }),
+      )
+    )
+      .filter((res): res is PromiseFulfilledResult<Winner> => res.status === 'fulfilled')
+      .map((res) => res.value);
 
     return { winners, winnersCount: data.totalCount };
   } catch (err) {
@@ -75,6 +85,15 @@ export const declareWinner = createAsyncThunk<
   }
 });
 
+export const removeWinner = createAsyncThunk<void, number>('garage/removeWinner', async (id) => {
+  try {
+    await winnersApi.removeWinnerApi(id);
+  } catch (err) {
+    console.error('Failed to remove the car:', err);
+    throw err;
+  }
+});
+
 const winnerSlice = createSlice({
   name: 'winners',
   initialState,
@@ -105,13 +124,17 @@ const winnerSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(
-      fetchWinners.fulfilled,
-      (state, action: PayloadAction<{ winners: Winner[]; winnersCount: number }>) => {
-        state.winners = action.payload.winners;
-        state.winnersCount = action.payload.winnersCount;
-      },
-    );
+    builder
+      .addCase(
+        fetchWinners.fulfilled,
+        (state, action: PayloadAction<{ winners: Winner[]; winnersCount: number }>) => {
+          state.winners = action.payload.winners;
+          state.winnersCount = action.payload.winnersCount;
+        },
+      )
+      .addCase(removeWinner.fulfilled, () => {
+        // state.winnersCount--;
+      });
   },
 });
 

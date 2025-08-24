@@ -39,4 +39,11 @@ const updateWinnerApi = async (id: number, carObj: Omit<WinnerRaw, 'id'>): Promi
   return (await res.json()) as WinnerRaw;
 };
 
-export default { getWinnersApi, getWinnerApi, addWinnerApi, updateWinnerApi };
+const removeWinnerApi = async (id: number) => {
+  const res = await fetch(`${URL}/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error(`failed to remove the car: ${res.status}`);
+};
+
+export default { getWinnersApi, getWinnerApi, addWinnerApi, updateWinnerApi, removeWinnerApi };
