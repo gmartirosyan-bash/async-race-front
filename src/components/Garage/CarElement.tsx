@@ -36,7 +36,7 @@ export default function CarElement({ car }: CarElementProps) {
             width: '160px',
             height: '80px',
           }}
-          className="absolute top-0 transition-all ease-linear"
+          className="absolute top-0 z-100 transition-all ease-linear"
         >
           <CarSvg className="w-40 h-20" fill={car.color} />
         </div>

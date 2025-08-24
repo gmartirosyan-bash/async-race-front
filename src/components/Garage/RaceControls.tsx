@@ -29,7 +29,7 @@ export default function RaceControls() {
       <button
         onClick={handleRace}
         className={`px-3 py-1 rounded-md border-2 text-lg border-red-500
-      ${carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
+      ${carIsMoving || finishedRacing ? 'pointer-events-none opacity-50' : ''}`}
       >
         RACE <Play className="inline text-red-600" size={18} />
       </button>

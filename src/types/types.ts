@@ -22,3 +22,9 @@ export interface WinnerRaw {
   wins: number;
   time: number;
 }
+
+export interface CurrentWinner {
+  id: number;
+  time: number;
+  name: string;
+}

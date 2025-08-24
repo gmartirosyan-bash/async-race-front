@@ -152,6 +152,25 @@ export const stopCar = createAsyncThunk<number, number>(
   },
 );
 
+export const resetCars = createAsyncThunk<void, void, { state: RootState; dispatch: AppDispatch }>(
+  'garage/resetCars',
+  async (_, { getState, dispatch }) => {
+    const moving: MovingCar[] = getState().garage.moving;
+    dispatch(fastResetCars());
+    try {
+      await dispatch(fetchCars(false));
+      await Promise.all(
+        moving.map(async (m) => {
+          await dispatch(stopCar(m.id));
+        }),
+      );
+    } catch (err) {
+      console.error('Failed to reset cars:', err);
+      throw err;
+    }
+  },
+);
+
 export const raceCars = createAsyncThunk<Car, void, { state: RootState; dispatch: AppDispatch }>(
   'garage/raceCars',
   async (_, { getState, dispatch }) => {
@@ -166,12 +185,10 @@ export const raceCars = createAsyncThunk<Car, void, { state: RootState; dispatch
     try {
       const winner = await Promise.any(drivePromises);
       const state = getState().garage;
-      // console.log('📦 moving array:', JSON.stringify(latestGarage.moving, null, 2));
       const id = winner.id;
-      const color = winner.color;
       const time = state.moving.find((m) => m.id === id)?.time;
       const name = state.cars.find((car) => car.id === id)?.name;
-      if (name && time) dispatch(declareWinner({ id, time, name, color }));
+      if (name && time) dispatch(declareWinner({ id, time, name }));
       return winner;
     } catch (err) {
       console.error('Failed to stop the car:', err);
@@ -193,12 +210,6 @@ const garageSlice = createSlice({
     setLoading(state, aciton: PayloadAction<boolean>) {
       state.loading = aciton.payload;
     },
-    resetCars(state) {
-      state.moving = [];
-      state.pendingMoving = [];
-      state.selected = null;
-      state.raceStatus = 'idle';
-    },
     nextCarsPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
@@ -217,12 +228,16 @@ const garageSlice = createSlice({
         state.page -= 1;
       }
     },
-    addPendingMoving: (state, action: PayloadAction<number>) => {
+    fastResetCars(state) {
+      state.moving = [];
+      state.selected = null;
+    },
+    addPendingMoving(state, action: PayloadAction<number>) {
       if (!state.pendingMoving.includes(action.payload)) {
         state.pendingMoving.push(action.payload);
       }
     },
-    removePendingMoving: (state, action: PayloadAction<number>) => {
+    removePendingMoving(state, action: PayloadAction<number>) {
       state.pendingMoving = state.pendingMoving.filter((id) => id !== action.payload);
     },
   },
@@ -258,6 +273,10 @@ const garageSlice = createSlice({
           car.id === action.payload ? { ...car, broke: true } : car,
         );
       })
+      .addCase(resetCars.fulfilled, (state) => {
+        state.pendingMoving = [];
+        state.raceStatus = 'idle';
+      })
       .addCase(raceCars.pending, (state) => {
         state.raceStatus = 'racing';
         state.selected = null;
@@ -278,7 +297,7 @@ export const {
   prevCarsPage,
   addPendingMoving,
   removePendingMoving,
+  fastResetCars,
   setLoading,
-  resetCars,
 } = garageSlice.actions;
 export default garageSlice.reducer;

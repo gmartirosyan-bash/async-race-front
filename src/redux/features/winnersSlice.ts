@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import winnersApi from '../../api/winners';
-import type { Winner, WinnerRaw } from '../../types/types';
+import type { Winner, WinnerRaw, CurrentWinner } from '../../types/types';
 import type { AppDispatch, RootState } from '../store';
 import { fetchCar } from './garageSlice';
 
 interface WinnerState {
   winners: Winner[];
-  currentWinner: Winner | null;
+  currentWinner: CurrentWinner | null;
   page: number;
   winnersCount: number;
 }
@@ -43,41 +43,45 @@ export const fetchWinners = createAsyncThunk<
   }
 });
 
-export const declareWinner = createAsyncThunk<Winner, Omit<Winner, 'wins'>>(
-  'winners/declareWinner',
-  async ({ id, time, name, color }) => {
+export const declareWinner = createAsyncThunk<
+  void,
+  { id: number; time: number; name: string },
+  { dispatch: AppDispatch }
+>('winners/declareWinner', async ({ id, time, name }, { dispatch }) => {
+  dispatch(setWinner({ id, time, name }));
+
+  try {
+    let wins: number;
+    let bestTime: number;
     try {
-      let wins: number;
-      let bestTime: number;
-      try {
-        const existing = await winnersApi.getWinnerApi(id);
-        wins = existing.wins + 1;
-        bestTime = Math.min(existing.time, time);
+      const existing = await winnersApi.getWinnerApi(id);
+      wins = existing.wins + 1;
+      bestTime = Math.min(existing.time, time);
 
-        await winnersApi.updateWinnerApi(id, { time: bestTime, wins });
-      } catch (err) {
-        if (err instanceof Error) {
-          wins = 1;
-          bestTime = time;
-          await winnersApi.addWinnerApi({ id, time: bestTime, wins });
-        } else {
-          console.error('Failed to get or update the winner:', err);
-          throw err;
-        }
-      }
-
-      return { id, name, color, time: bestTime, wins };
+      await winnersApi.updateWinnerApi(id, { time: bestTime, wins });
     } catch (err) {
-      console.error('Failed to declare the winner:', err);
-      throw err;
+      if (err instanceof Error) {
+        wins = 1;
+        bestTime = time;
+        await winnersApi.addWinnerApi({ id, time: bestTime, wins });
+      } else {
+        console.error('Failed to get or update the winner:', err);
+        throw err;
+      }
     }
-  },
-);
+  } catch (err) {
+    console.error('Failed to declare the winner:', err);
+    throw err;
+  }
+});
 
 const winnerSlice = createSlice({
   name: 'winners',
   initialState,
   reducers: {
+    setWinner(state, action: PayloadAction<CurrentWinner>) {
+      state.currentWinner = action.payload;
+    },
     clearWinner(state) {
       state.currentWinner = null;
     },
@@ -101,19 +105,15 @@ const winnerSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(declareWinner.fulfilled, (state, action) => {
-        state.currentWinner = action.payload;
-      })
-      .addCase(
-        fetchWinners.fulfilled,
-        (state, action: PayloadAction<{ winners: Winner[]; winnersCount: number }>) => {
-          state.winners = action.payload.winners;
-          state.winnersCount = action.payload.winnersCount;
-        },
-      );
+    builder.addCase(
+      fetchWinners.fulfilled,
+      (state, action: PayloadAction<{ winners: Winner[]; winnersCount: number }>) => {
+        state.winners = action.payload.winners;
+        state.winnersCount = action.payload.winnersCount;
+      },
+    );
   },
 });
 
-export const { clearWinner, nextWinnersPage, prevWinnersPage } = winnerSlice.actions;
+export const { setWinner, clearWinner, nextWinnersPage, prevWinnersPage } = winnerSlice.actions;
 export default winnerSlice.reducer;

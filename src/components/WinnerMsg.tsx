@@ -1,14 +1,8 @@
 import { createPortal } from 'react-dom';
 import { Crown } from 'lucide-react';
-import type { Winner } from '../types/types';
+import type { CurrentWinner } from '../types/types';
 
-// interface Winner {
-//   id: number;
-//   time: number;
-//   name: string;
-// }
-
-export default function WinnerMsg({ winner }: { winner: Winner }) {
+export default function WinnerMsg({ winner }: { winner: CurrentWinner }) {
   return createPortal(
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-red-800/90 text-black font-bold text-5xl px-8 py-4 rounded-lg shadow-lg/80 shadow-amber-200 text-center space-y-6">
