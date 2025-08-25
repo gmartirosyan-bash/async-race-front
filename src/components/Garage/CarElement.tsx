@@ -26,26 +26,22 @@ export default function CarElement({ car }: CarElementProps) {
   }, [movingCars, carState]);
 
   return (
-    <>
-      <div className="relative w-full h-20 overflow-hidden">
-        <div
-          ref={carRef}
-          style={{
-            left: isMoving ? '85%' : '0%',
-            transitionDuration: isMoving ? `${speed}ms` : '0s',
-            width: '160px',
-            height: '80px',
-          }}
-          className="absolute top-0 transition-all ease-linear"
-        >
-          <CarSvg className="w-40 h-20" fill={car.color} />
-        </div>
-        <img
-          src="/prefinish.png"
-          alt="finish"
-          className="w-25 scale-160 absolute -z-10 -top-2 left-[92%]"
-        />
+    <div className="relative w-full h-20 overflow-hidden sm:border-0 border-t-4 border-dashed border-amber-400">
+      <div
+        ref={carRef}
+        style={{
+          left: isMoving ? `calc(100% - 160px)` : '0%',
+          transitionDuration: isMoving ? `${speed}ms` : '0s',
+        }}
+        className={`absolute top-0 transition-all ease-linear w-[160px] h-[80px]`}
+      >
+        <CarSvg className="w-full h-full" fill={car.color} />
       </div>
-    </>
+      <img
+        src="/prefinish.png"
+        alt="finish"
+        className="absolute w-25 scale-160 -z-10 -top-2 sm:left-[93%] left-[85%]"
+      />
+    </div>
   );
 }

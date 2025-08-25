@@ -3,7 +3,6 @@ import { fetchCars } from '../redux/features/garageSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import GarageMenu from '../components/Garage/GarageMenu';
 import GarageCars from '../components/Garage/GarageCars';
-import Border from '../components/Garage/Border';
 import WinnerMsg from '../components/Garage/WinnerMsg';
 import EmptyGarage from '../components/Garage/EmpyGarage';
 import { clearWinner } from '../redux/features/winnersSlice';
@@ -36,12 +35,10 @@ export default function Garage() {
   return (
     <>
       {showWinner && winner && <WinnerMsg winner={winner} />}
-      <div className="overflow-hidden max-w-350 m-auto font-roboto">
+      <div className="overflow-hidden sm:max-w-350 max-w-150 m-auto font-roboto">
         <GarageMenu />
-        <Border />
         {carsCount === 0 && <EmptyGarage />}
         <GarageCars />
-        <Border />
       </div>
     </>
   );

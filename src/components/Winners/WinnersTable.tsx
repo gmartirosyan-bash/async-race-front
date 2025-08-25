@@ -34,15 +34,15 @@ export default function WinnersTable() {
   };
 
   return (
-    <div className="overflow-x-auto mt-20 max-w-300 m-auto">
+    <div className="overflow-x-auto mt-20 max-w-300 m-auto text-center">
       <table className="table-fixed w-full border-collapse border border-neutral-700 text-neutral-200">
-        <thead className="bg-neutral-800 text-left font-orbitron">
+        <thead className="bg-neutral-800 font-orbitron">
           <tr>
-            <th className="border border-neutral-700 px-4 py-2">Number</th>
+            <th className="border border-neutral-700 px-4 py-2 sm:w-auto w-24">Number</th>
             <th className="border border-neutral-700 px-4 py-2">Car</th>
             <th className="border border-neutral-700 px-4 py-2">Name</th>
             <th
-              className="border border-neutral-700 px-4 py-2 cursor-pointer"
+              className="border border-neutral-700 px-4 py-2 sm:w-auto w-24 cursor-pointer"
               onClick={() => handleSort('wins')}
             >
               Wins{' '}
@@ -51,7 +51,7 @@ export default function WinnersTable() {
               </span>
             </th>
             <th
-              className="border border-neutral-700 px-4 py-2 cursor-pointer"
+              className="border border-neutral-700 px-4 py-2 sm:w-auto w-24 cursor-pointer"
               onClick={() => handleSort('time')}
             >
               Best time (s){' '}
@@ -68,9 +68,9 @@ export default function WinnersTable() {
               <tr key={winner.id}>
                 <td className="border border-neutral-700 px-4 py-2">{winner.id}</td>
                 <td className="border border-neutral-700 px-4 py-2">
-                  <CarSvg className="w-20 h-10" fill={winner.color} />
+                  <CarSvg className="sm:w-20 sm:h-10 w-14 h-7 m-auto" fill={winner.color} />
                 </td>
-                <td className="border border-neutral-700 px-4 py-2">{winner.name}</td>
+                <td className="border border-neutral-700 px-4 py-2 break-words">{winner.name}</td>
                 <td className="border border-neutral-700 px-4 py-2">{winner.wins}</td>
                 <td className="border border-neutral-700 px-4 py-2">
                   {Math.floor(winner.time) / 1000}

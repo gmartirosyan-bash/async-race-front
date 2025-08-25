@@ -294,6 +294,9 @@ const garageSlice = createSlice({
           car.id === action.payload ? { ...car, broke: true } : car,
         );
       })
+      .addCase(resetCars.pending, (state) => {
+        state.raceStatus = 'finished';
+      })
       .addCase(resetCars.fulfilled, (state) => {
         state.pendingMoving = [];
         state.raceStatus = 'idle';

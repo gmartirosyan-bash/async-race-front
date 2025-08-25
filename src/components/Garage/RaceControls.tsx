@@ -8,7 +8,8 @@ export default function RaceControls() {
   const raceStatus = useAppSelector((status) => status.garage.raceStatus);
 
   const carIsMoving = movingCars.length > 0;
-  const finishedRacing = raceStatus === 'finished';
+  const starting = raceStatus === 'idle';
+  const racing = raceStatus === 'racing';
   const dispatch = useAppDispatch();
 
   const handleRace = () => {
@@ -29,14 +30,14 @@ export default function RaceControls() {
       <button
         onClick={handleRace}
         className={`px-3 py-1 rounded-md border-2 text-lg border-red-500
-      ${carIsMoving || finishedRacing ? 'pointer-events-none opacity-50' : ''}`}
+      ${carIsMoving || !starting ? 'pointer-events-none opacity-50' : ''}`}
       >
         RACE <Play className="inline text-red-600" size={18} />
       </button>
       <button
         onClick={handleReset}
         className={`px-3 py-1 rounded-md border-2 text-lg border-red-500 
-          ${!finishedRacing || !carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
+          ${racing || !carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
       >
         RESET <Undo className="inline text-red-600" size={18} />
       </button>
