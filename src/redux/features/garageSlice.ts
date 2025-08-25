@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import carsApi from '../../api/cars';
-import engineApi from '../../api/race';
+import carsApi from '../../api/carsApi';
+import engineApi from '../../api/raceApi';
 import { declareWinner, removeWinner } from './winnersSlice';
 import type { Car, MovingCar, Start, RaceStatus } from '../../types/types';
 import type { RootState, AppDispatch } from '../store';

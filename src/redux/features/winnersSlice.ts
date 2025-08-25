@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import winnersApi from '../../api/winners';
+import winnersApi from '../../api/winnersApi';
 import type { Winner, WinnerRaw, CurrentWinner } from '../../types/types';
 import type { AppDispatch, RootState } from '../store';
 import { fetchCar } from './garageSlice';

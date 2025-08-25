@@ -31,7 +31,7 @@ export default function Header() {
             to="/garage"
             onClick={handleToGarage}
             className={`p-4 px-6 mr-4 bg-blue-500 text-white 
-              font-semibold rounded-lg hover:bg-blue-600
+              font-semibold rounded-lg hover:bg-blue-600 active:bg-blue-400
               ${isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
           >
             TO GARAGE <DoorClosed className="inline" />
@@ -40,7 +40,7 @@ export default function Header() {
             to="/winners"
             onClick={handleToWinners}
             className={`p-4 px-6 text-white bg-yellow-600 
-              hover:bg-yellow-700 active:bg-amber-500 active:text-black
+              hover:bg-yellow-700 active:bg-amber-500
               font-semibold rounded-lg
               ${isRacing || !isOnGarage ? 'pointer-events-none opacity-50' : ''}`}
           >
