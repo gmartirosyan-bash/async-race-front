@@ -26,7 +26,7 @@ export default function CarElement({ car }: CarElementProps) {
   }, [movingCars, carState]);
 
   return (
-    <div className="relative w-full h-20 overflow-hidden sm:border-0 border-t-4 border-dashed border-amber-400">
+    <div className="relative w-full h-20 overflow-hidden lg:border-0 border-t-4 border-dashed border-amber-400">
       <div
         ref={carRef}
         style={{
@@ -40,7 +40,7 @@ export default function CarElement({ car }: CarElementProps) {
       <img
         src="/prefinish.png"
         alt="finish"
-        className="absolute w-25 scale-160 -z-10 -top-2 sm:left-[93%] left-[85%]"
+        className="absolute w-25 scale-160 -z-10 -top-2 xl:left-[93%] md:left-[91%] sm:left-[87%] left-[85%]"
       />
     </div>
   );

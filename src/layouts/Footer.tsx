@@ -40,7 +40,7 @@ export default function Footer() {
   return (
     <footer>
       <div
-        className="m-auto max-w-300 flex items-center sm:justify-between 
+        className="m-auto max-w-300 flex items-center lg:justify-between 
         justify-around mt-8 mb-12 text-red-800 font-semibold sm:text-3xl text-2xl"
       >
         <div className="flex items-center">

@@ -51,7 +51,7 @@ export default function CarPanel({ car }: CarPanelProps) {
 
   return (
     <div className={`relative flex items-center gap-4 my-5`}>
-      <div className="flex flex-col gap-3 sm:ml-6 ml-3">
+      <div className="flex flex-col gap-3 lg:ml-6 ml-3">
         <button
           onClick={() => handleSelectCar(car)}
           className={`font-semibold text-yellow-400 border-1 border-yellow-400 rounded p-1
@@ -86,7 +86,7 @@ export default function CarPanel({ car }: CarPanelProps) {
         >
           STOP
         </button>
-        <p className="absolute font-bitcount sm:font-extralight font-light text-amber-200 sm:left-85 left-40 top-3 sm:text-5xl text-2xl -z-10 sm:min-w-200">
+        <p className="absolute font-bitcount md:font-extralight font-light text-amber-200 lg:left-85 left-40 top-3 sm:text-4xl md:text-5xl text-2xl -z-10">
           {car.name}
         </p>
       </div>

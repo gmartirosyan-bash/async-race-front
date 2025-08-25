@@ -35,7 +35,7 @@ export default function Garage() {
   return (
     <>
       {showWinner && winner && <WinnerMsg winner={winner} />}
-      <div className="overflow-hidden sm:max-w-350 max-w-150 m-auto font-roboto">
+      <div className="overflow-hidden lg:max-w-350  m-auto font-roboto">
         <GarageMenu />
         {carsCount === 0 && <EmptyGarage />}
         <GarageCars />
