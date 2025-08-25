@@ -29,21 +29,21 @@ export default function RaceControls() {
     <div className={`flex gap-6 font-orbitron`}>
       <button
         onClick={handleRace}
-        className={`px-3 py-1 rounded-md border-2 text-lg border-red-500
+        className={`px-3 py-1 rounded-md border-2 text-lg active:scale-95 border-red-500
       ${carIsMoving || !starting ? 'pointer-events-none opacity-50' : ''}`}
       >
         RACE <Play className="inline text-red-600" size={18} />
       </button>
       <button
         onClick={handleReset}
-        className={`px-3 py-1 rounded-md border-2 text-lg border-red-500 
+        className={`px-3 py-1 rounded-md border-2 text-lg active:scale-95 border-red-500 
           ${racing || !carIsMoving ? 'pointer-events-none opacity-50' : ''}`}
       >
         RESET <Undo className="inline text-red-600" size={18} />
       </button>
       <button
         onClick={handleGenerate}
-        className="px-3 py-1 rounded-md border-2 text-lg border-red-500"
+        className="px-3 py-1 rounded-md border-2 text-lg active:scale-95 border-red-500"
       >
         GENERATE CARS
       </button>
