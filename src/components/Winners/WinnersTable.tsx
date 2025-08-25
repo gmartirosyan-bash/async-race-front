@@ -3,13 +3,18 @@ import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import carSvgs from '../../utils/carSvgs';
 import { fetchWinners } from '../../redux/features/winnersSlice';
 
+type SortKey = 'wins' | 'time';
+type SortOrder = 'ASC' | 'DESC';
+
 export default function WinnersTable() {
   const dispatch = useAppDispatch();
   const winners = useAppSelector((state) => state.winners.winners);
   const page = useAppSelector((state) => state.winners.page);
 
-  const [sortKey, setSortKey] = useState<'wins' | 'time' | null>(null);
-  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC' | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder | null>(null);
+
+  const MS_IN_SECOND = 1000;
 
   useEffect(() => {
     dispatch(
@@ -20,7 +25,7 @@ export default function WinnersTable() {
     );
   }, [page, sortKey, sortOrder, dispatch]);
 
-  const handleSort = (key: 'wins' | 'time') => {
+  const handleSort = (key: SortKey) => {
     if (sortKey === key) {
       if (sortOrder === 'ASC') {
         setSortOrder('DESC');
@@ -63,7 +68,7 @@ export default function WinnersTable() {
         </thead>
         <tbody>
           {winners.map((winner) => {
-            const CarSvg = carSvgs[winner.id % 9];
+            const CarSvg = carSvgs[winner.id % carSvgs.length];
             return (
               <tr key={winner.id}>
                 <td className="border border-neutral-700 px-4 py-2">{winner.id}</td>
@@ -73,7 +78,7 @@ export default function WinnersTable() {
                 <td className="border border-neutral-700 px-4 py-2 break-words">{winner.name}</td>
                 <td className="border border-neutral-700 px-4 py-2">{winner.wins}</td>
                 <td className="border border-neutral-700 px-4 py-2">
-                  {Math.floor(winner.time) / 1000}
+                  {Math.floor(winner.time) / MS_IN_SECOND}
                 </td>
               </tr>
             );

@@ -10,6 +10,8 @@ export default function Footer() {
   const carsCount = useAppSelector((state) => state.garage.carsCount);
   const winnersCount = useAppSelector((state) => state.winners.winnersCount);
   const raceStatus = useAppSelector((status) => status.garage.raceStatus);
+  const garagePageLimit = useAppSelector((status) => status.garage.pageLimit);
+  const winnersPageLimit = useAppSelector((status) => status.winners.pageLimit);
 
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -54,7 +56,9 @@ export default function Footer() {
           </button>
           <p className="mx-1 text-neutral-300">
             PAGE #{isOnGarage ? carsPage : winnersPage}/
-            {isOnGarage ? Math.ceil(carsCount / 7) : Math.ceil(winnersCount / 10)}
+            {isOnGarage
+              ? Math.ceil(carsCount / garagePageLimit)
+              : Math.ceil(winnersCount / winnersPageLimit)}
           </p>
           <button
             className={`w-8 h-8 flex items-center justify-center 

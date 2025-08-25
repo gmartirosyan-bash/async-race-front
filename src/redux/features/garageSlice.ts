@@ -13,6 +13,7 @@ interface GarageState {
   moving: MovingCar[];
   pendingMoving: number[];
   page: number;
+  pageLimit: number;
   carsCount: number;
   raceStatus: RaceStatus;
 }
@@ -25,6 +26,7 @@ const initialState: GarageState = {
   moving: [],
   pendingMoving: [],
   page: 1,
+  pageLimit: 7,
   carsCount: 0,
   raceStatus: 'idle',
 };
@@ -34,9 +36,12 @@ export const fetchCars = createAsyncThunk<
   void,
   { state: RootState }
 >('garage/fetchCars', async (_, { getState }) => {
-  const page = getState().garage.page;
+  const garage = getState().garage;
+  const page = garage.page;
+  const pageLimit = garage.pageLimit;
+
   try {
-    const data = await carsApi.getCarsApi(page);
+    const data = await carsApi.getCarsApi(page, pageLimit);
     return data;
   } catch (err) {
     console.error('Failed to fetch the cars:', err);
@@ -220,7 +225,7 @@ const garageSlice = createSlice({
     nextCarsPage(state) {
       if (state.carsCount === 0) {
         state.page = 1;
-      } else if (state.page === Math.ceil(state.carsCount / 7)) {
+      } else if (state.page === Math.ceil(state.carsCount / state.pageLimit)) {
         state.page = 1;
       } else {
         state.page += 1;
@@ -230,7 +235,7 @@ const garageSlice = createSlice({
       if (state.carsCount === 0) {
         state.page = 1;
       } else if (state.page === 1) {
-        state.page = Math.ceil(state.carsCount / 7);
+        state.page = Math.ceil(state.carsCount / state.pageLimit);
       } else {
         state.page -= 1;
       }
@@ -266,7 +271,7 @@ const garageSlice = createSlice({
         console.error(action.payload ?? action.error.message);
       })
       .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
-        if (state.cars.length < 7) state.cars.push(action.payload);
+        if (state.cars.length < state.pageLimit) state.cars.push(action.payload);
         state.carsCount++;
       })
       .addCase(removeCar.fulfilled, (state) => {

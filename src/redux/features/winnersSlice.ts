@@ -8,6 +8,7 @@ interface WinnerState {
   winners: Winner[];
   currentWinner: CurrentWinner | null;
   page: number;
+  pageLimit: number;
   winnersCount: number;
 }
 
@@ -15,6 +16,7 @@ const initialState: WinnerState = {
   winners: [],
   currentWinner: null,
   page: 1,
+  pageLimit: 10,
   winnersCount: 0,
 };
 
@@ -23,12 +25,14 @@ export const fetchWinners = createAsyncThunk<
   { sort?: 'wins' | 'time'; order?: 'ASC' | 'DESC' } | void,
   { state: RootState; dispatch: AppDispatch }
 >('winners/fetchWinners', async (params, { getState, dispatch, rejectWithValue }) => {
-  const page = getState().winners.page;
+  const winners = getState().winners;
+  const page = winners.page;
+  const pageLimit = winners.pageLimit;
   const sort = params?.sort;
   const order = params?.order;
 
   try {
-    const data = await winnersApi.getWinnersApi(page, sort, order);
+    const data = await winnersApi.getWinnersApi(page, pageLimit, sort, order);
 
     const winnersRaw: WinnerRaw[] = data.winners;
 
@@ -140,7 +144,7 @@ const winnerSlice = createSlice({
     nextWinnersPage(state) {
       if (state.winnersCount === 0) {
         state.page = 1;
-      } else if (state.page === Math.ceil(state.winnersCount / 10)) {
+      } else if (state.page === Math.ceil(state.winnersCount / state.pageLimit)) {
         state.page = 1;
       } else {
         state.page += 1;
@@ -150,7 +154,7 @@ const winnerSlice = createSlice({
       if (state.winnersCount === 0) {
         state.page = 1;
       } else if (state.page === 1) {
-        state.page = Math.ceil(state.winnersCount / 10);
+        state.page = Math.ceil(state.winnersCount / state.pageLimit);
       } else {
         state.page -= 1;
       }

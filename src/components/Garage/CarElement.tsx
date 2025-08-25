@@ -11,7 +11,7 @@ export default function CarElement({ car }: CarElementProps) {
   const movingCars = useAppSelector((state) => state.garage.moving);
   const carRef = useRef<HTMLDivElement>(null);
 
-  const CarSvg = carSvgs[car.id % 9];
+  const CarSvg = carSvgs[car.id % carSvgs.length];
   const isMoving = movingCars.some((mc) => mc.id === car.id);
   const speed = movingCars.find((mc) => mc.id === car.id)?.time;
   const carState = movingCars.find((mc) => mc.id === car.id);

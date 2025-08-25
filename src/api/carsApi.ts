@@ -2,8 +2,11 @@ import type { Car } from '../types/types';
 
 const URL = 'http://localhost:3000/garage';
 
-const getCarsApi = async (page: number): Promise<{ cars: Car[]; totalCount: number }> => {
-  const res = await fetch(`${URL}?_page=${page}&_limit=7`);
+const getCarsApi = async (
+  page: number,
+  limit = 7,
+): Promise<{ cars: Car[]; totalCount: number }> => {
+  const res = await fetch(`${URL}?_page=${page}&_limit=${limit}`);
   if (!res.ok) throw res;
 
   const totalCount = Number(res.headers.get('X-Total-Count'));

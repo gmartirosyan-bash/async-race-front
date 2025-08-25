@@ -3,10 +3,11 @@ import type { WinnerRaw } from '../types/types';
 
 const getWinnersApi = async (
   page: number,
+  pageLimit = 10,
   sort?: 'wins' | 'time',
   order?: 'ASC' | 'DESC',
 ): Promise<{ winners: WinnerRaw[]; totalCount: number }> => {
-  let url = `${URL}?_page=${page}&_limit=10`;
+  let url = `${URL}?_page=${page}&_limit=${pageLimit}`;
   if (sort) url += `&_sort=${sort}`;
   if (order) url += `&_order=${order}`;
 

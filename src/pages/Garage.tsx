@@ -14,6 +14,8 @@ export default function Garage() {
 
   const [showWinner, setShowWinner] = useState(false);
 
+  const noCars = carsCount === 0 ? true : false;
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function Garage() {
       {showWinner && winner && <WinnerMsg winner={winner} />}
       <div className="overflow-hidden lg:max-w-350  m-auto font-roboto">
         <GarageMenu />
-        {carsCount === 0 && <EmptyGarage />}
+        {noCars && <EmptyGarage />}
         <GarageCars />
       </div>
     </>

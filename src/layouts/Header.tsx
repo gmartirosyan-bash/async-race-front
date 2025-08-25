@@ -24,7 +24,7 @@ export default function Header() {
   return (
     <header className="bg-red-800/40 shadow-lg shadow-red-500">
       <div className="m-auto max-w-350 flex items-center justify-around">
-        <img src="/logo4.png" alt="logo" className="sm:w-40 w-20" />
+        <img src="/logo.png" alt="logo" className="sm:w-40 w-20" />
 
         <div className="flex sm:flex-row my-2 items-center">
           <Link
