@@ -24,6 +24,7 @@ function App() {
         <Route path="garage" element={<Garage />} />
         <Route path="winners" element={<Winners />} />
       </Route>
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

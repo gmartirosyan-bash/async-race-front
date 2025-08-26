@@ -61,7 +61,7 @@ export default function CarPanel({ car }: CarPanelProps) {
         </button>
         <button
           onClick={() => handleRemoveCar(car.id)}
-          className={`font-semibold text-red-600 border-1 borde-red-600 rounded p-1
+          className={`font-semibold text-red-600 border-1 border-red-600 rounded p-1
           ${isRacing ? 'pointer-events-none opacity-50' : ''}`}
         >
           <Trash2 size={15} />

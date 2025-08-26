@@ -12,7 +12,7 @@ const getWinnersApi = async (
   if (order) url += `&_order=${order}`;
 
   const res = await fetch(url);
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const totalCount = Number(res.headers.get('X-Total-Count'));
   const winners = (await res.json()) as WinnerRaw[];
@@ -22,7 +22,7 @@ const getWinnersApi = async (
 
 const getWinnerApi = async (id: number): Promise<WinnerRaw> => {
   const res = await fetch(`${URL}/${id}`);
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return (await res.json()) as WinnerRaw;
 };
 
@@ -32,7 +32,7 @@ const addWinnerApi = async (carObj: WinnerRaw): Promise<WinnerRaw> => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(carObj),
   });
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return (await res.json()) as WinnerRaw;
 };
 
@@ -42,7 +42,7 @@ const updateWinnerApi = async (id: number, carObj: Omit<WinnerRaw, 'id'>): Promi
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(carObj),
   });
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return (await res.json()) as WinnerRaw;
 };
 
@@ -50,7 +50,7 @@ const removeWinnerApi = async (id: number) => {
   const res = await fetch(`${URL}/${id}`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 };
 
 export default { getWinnersApi, getWinnerApi, addWinnerApi, updateWinnerApi, removeWinnerApi };

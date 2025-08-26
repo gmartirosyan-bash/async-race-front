@@ -4,7 +4,7 @@
 
 ## Checklist 400/400 pts
 
-**Link To:** [AsyncRace](https://async-race-front-c9u2.vercel.app/)
+**Live Demo:** [AsyncRace](https://async-race-front-c9u2.vercel.app/)
 
 ## 🚀 UI Deployment
 

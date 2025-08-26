@@ -7,7 +7,7 @@ const getCarsApi = async (
   limit = 7,
 ): Promise<{ cars: Car[]; totalCount: number }> => {
   const res = await fetch(`${URL}?_page=${page}&_limit=${limit}`);
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const totalCount = Number(res.headers.get('X-Total-Count'));
   const cars = (await res.json()) as Car[];
@@ -17,7 +17,7 @@ const getCarsApi = async (
 
 const getCarApi = async (id: number): Promise<Car> => {
   const res = await fetch(`${URL}/${id}`);
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return (await res.json()) as Car;
 };
 
@@ -27,7 +27,7 @@ const addCarApi = async (carObj: { name: string; color: string }): Promise<Car> 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(carObj),
   });
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return (await res.json()) as Car;
 };
 
@@ -35,7 +35,7 @@ const removeCarApi = async (id: number) => {
   const res = await fetch(`${URL}/${id}`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 };
 
 const updateCarApi = async (id: number, carObj: Omit<Car, 'id'>): Promise<Car> => {
@@ -44,7 +44,7 @@ const updateCarApi = async (id: number, carObj: Omit<Car, 'id'>): Promise<Car> =
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(carObj),
   });
-  if (!res.ok) throw res;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return (await res.json()) as Car;
 };
 

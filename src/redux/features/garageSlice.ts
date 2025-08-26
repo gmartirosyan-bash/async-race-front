@@ -56,12 +56,12 @@ export const fetchCar = createAsyncThunk<Car | undefined, number, { dispatch: Ap
       const data = await carsApi.getCarApi(id);
       return data;
     } catch (err: unknown) {
-      if (err instanceof Response) {
-        if (err.status === 404) {
+      if (err instanceof Error) {
+        if (err.message.includes('404')) {
           dispatch(removeWinner(id));
           return undefined;
         }
-        return rejectWithValue(`Failed to remove winner (status ${err.status} ${err.statusText})`);
+        return rejectWithValue(`Failed to remove winner (status ${err.message})`);
       }
       return rejectWithValue(`Failed to remove winner (unknown error)`);
     }
@@ -77,8 +77,7 @@ export const addCar = createAsyncThunk<
     const data = await carsApi.addCarApi(newCar);
     return data;
   } catch (err: unknown) {
-    if (err instanceof Response)
-      return rejectWithValue(`Failed to add a car (status ${err.status} ${err.statusText})`);
+    if (err instanceof Error) return rejectWithValue(`Failed to add a car (status ${err.message})`);
     return rejectWithValue('Failed to add a car (unknown error)');
   }
 });
@@ -108,8 +107,8 @@ export const updateCar = createAsyncThunk<
     const data = await carsApi.updateCarApi(id, newCar);
     return data;
   } catch (err: unknown) {
-    if (err instanceof Response)
-      return rejectWithValue(`Failed to update the car (status ${err.status} ${err.statusText})`);
+    if (err instanceof Error)
+      return rejectWithValue(`Failed to update the car (status ${err.message})`);
     return rejectWithValue('Failed to update the car (unknown error)');
   }
 });
@@ -140,7 +139,7 @@ export const driveCar = createAsyncThunk<
     const data = await engineApi.raceApi(id, 'drive');
     return data as Start;
   } catch (err: unknown) {
-    if (err instanceof Response && err.status === 500) {
+    if (err instanceof Error && err.message.includes('500')) {
       return rejectWithValue(id);
     }
     console.error('Failed to drive the car :', err);
@@ -156,8 +155,8 @@ export const stopCar = createAsyncThunk<number, number>(
       await engineApi.raceApi(id, 'stopped');
       return id;
     } catch (err: unknown) {
-      if (err instanceof Response)
-        return rejectWithValue(`Failed to stop the car (status ${err.status} ${err.statusText})`);
+      if (err instanceof Error)
+        return rejectWithValue(`Failed to stop the car (status ${err.message})`);
       return rejectWithValue('Failed to stop the car (unknown error)');
     }
   },

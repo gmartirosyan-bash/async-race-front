@@ -51,8 +51,8 @@ export const fetchWinners = createAsyncThunk<
 
     return { winners: filteredWinners, winnersCount: data.totalCount };
   } catch (err: unknown) {
-    if (err instanceof Response) {
-      return rejectWithValue(`Failed to fetch winners (status ${err.status} ${err.statusText})`);
+    if (err instanceof Error) {
+      return rejectWithValue(`Failed to fetch winners (status ${err.message})`);
     }
     return rejectWithValue('Failed to fetch winners (unknown error)');
   }
@@ -72,13 +72,13 @@ export const declareWinner = createAsyncThunk<
 
     await dispatch(updateWinner({ id, time: bestTime, wins })).unwrap();
   } catch (err: unknown) {
-    if (err instanceof Response && err.status === 404) {
+    if (err instanceof Error && err.message.includes('404')) {
       const wins = 1;
       const bestTime = time;
 
       await dispatch(addWinner({ id, time: bestTime, wins })).unwrap();
-    } else if (err instanceof Response) {
-      return rejectWithValue(`Failed to get winner (status ${err.status} ${err.statusText})`);
+    } else if (err instanceof Error) {
+      return rejectWithValue(`Failed to get winner (status ${err.message})`);
     } else {
       return rejectWithValue('Failed to get winner (unknown error)');
     }
@@ -91,9 +91,9 @@ export const removeWinner = createAsyncThunk<void, number>(
     try {
       await winnersApi.removeWinnerApi(id);
     } catch (err: unknown) {
-      if (err instanceof Response) {
-        if (err.status === 404) return;
-        return rejectWithValue(`Failed to remove winner (status ${err.status} ${err.statusText})`);
+      if (err instanceof Error) {
+        if (err.message.includes('404')) return;
+        return rejectWithValue(`Failed to remove winner (status ${err.message})`);
       }
       return rejectWithValue('Failed to remove winner (unknown error)');
     }
@@ -106,8 +106,8 @@ export const updateWinner = createAsyncThunk<void, WinnerRaw>(
     try {
       await winnersApi.updateWinnerApi(id, { time, wins });
     } catch (err: unknown) {
-      if (err instanceof Response) {
-        return rejectWithValue(`Failed to update winner (status ${err.status} ${err.statusText})`);
+      if (err instanceof Error) {
+        return rejectWithValue(`Failed to update winner (status ${err.message})`);
       }
       return rejectWithValue('Failed to update winner (unknown error)');
     }
@@ -120,8 +120,8 @@ export const addWinner = createAsyncThunk<void, WinnerRaw>(
     try {
       await winnersApi.addWinnerApi({ id, time, wins });
     } catch (err: unknown) {
-      if (err instanceof Response) {
-        return rejectWithValue(`Failed to add winner (status ${err.status} ${err.statusText})`);
+      if (err instanceof Error) {
+        return rejectWithValue(`Failed to add winner (status ${err.message})`);
       }
       return rejectWithValue('Failed to add winner (unknown error)');
     }
