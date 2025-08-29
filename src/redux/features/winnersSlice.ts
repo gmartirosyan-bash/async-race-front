@@ -16,7 +16,7 @@ const initialState: WinnerState = {
   winners: [],
   currentWinner: null,
   page: 1,
-  pageLimit: 3,
+  pageLimit: 10,
   winnersCount: 0,
 };
 
